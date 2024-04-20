@@ -1,4 +1,4 @@
-![Dungeon Adventures Banner](./assets/Dungeon_Adventures 😈.png)
+![Dungeon Adventures Banner](./assets/endYearProjectBanner.png)
 
 # Dungeon Adventure!
 
