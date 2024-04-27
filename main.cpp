@@ -1,6 +1,4 @@
 #include "./include/colors.h"
-#include "./include/enemy.h"
-#include <chrono>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -10,14 +8,12 @@
 Color color;
 
 void printSword() {  // Prints out sword ASCII
-
     std::cout << color.BOLD << "      [|_________________" << std::endl
               << "0|===|<>_________________>" << std::endl
               << "      [|" << color.NC << std::endl;
 }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
-
     auto two_seconds = std::chrono::seconds(2);
     auto one_second = std::chrono::seconds(1);
 
@@ -34,7 +30,7 @@ void beginningScreenSequence() {  // beginning animation-ish sequence
 
     std::this_thread::sleep_for(two_seconds);
 
-    std::cout << color.ITALICIZE_BLACK << "               But to serve."
+    std::cout << color.ITALICIZE_PURPLE << "               But to serve."
               << std::endl
               << std::endl;
 
@@ -94,7 +90,10 @@ void titleScreen() {
     std::cout << std::endl << std::endl;
 
     beginningScreenSequence();
+}
 
+int startOptions() {
+    // Title Screen Printout
     std::cout << color.NC << std::endl << std::endl;
     printSword();  // print sword ASCII art
 
@@ -102,39 +101,64 @@ void titleScreen() {
 
     std::cout << "     " << color.UNDERLINE << color.BOLD_RED
               << "Dungeon Warrior" << color.NC << std::endl;
-}
-
-std::string startOptions() {
-    std::string choice;
-    int intChoice;
-
+    // Start Menu
+    int choice;
     while (true) {
-        std::cout << "(I) New Game" << std::endl
-                  << "(II) Load Game" << std::endl
-                  << "(III) Exit" << std::endl
+        std::cout << "(1) New Game" << std::endl
+                  << "(2) Load Game" << std::endl
+                  << "(3) Exit" << std::endl
                   << std::endl
-                  << "Please input a roman numeral: ";
-
+                  << "Enter your choice: ";
         if (std::cin >> choice) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-            if (choice == "I" || choice == "II" || choice == "III") {
+            if (choice == 1 || choice == 2 || choice == 3) {
                 return choice;
             } else {
                 std::cout << "Not an option!" << std::endl;
                 continue;
             }
-        } else if (std::cin >> intChoice) {
+        } else {
+            std::cout << "Invalid input type, please try again." << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid integer input!" << std::endl;
         }
     }
+}
+
+void programExit() {
+    std::cout << color.UNDERLINE << color.BOLD_CYAN << "EXITING CREDITS"
+              << color.NC << std::endl
+              << std::endl;
+    std::cout << color.BOLD_GREEN << "Thank you for playing Dungeon Warrior!"
+              << std::endl;
+    // utilizing raw string literals for ASCII art
+    std::cout << R"(
+      ／l、             
+    （ﾟ､ ｡ ７   Creator: Jester 💜  
+      l  ~ヽ       
+      じしf_,)ノ
+    )" << color.NC
+              << std::endl;
+    exit(0);
 }
 
 int main() {
     titleScreen();  // Initialize title screen
 
-    startOptions();  // starting options
+    int option = startOptions();
+
+    switch (option) {
+    case (1):
+        std::cout << "Switch case 1" << std::endl;
+        break;
+    case (2):
+        std::cout << "Switch case 2" << std::endl;
+        break;
+    case (3):
+        std::cout << std::endl << std::endl;
+        programExit();
+        break;
+    }
 }
