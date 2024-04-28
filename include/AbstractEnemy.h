@@ -16,8 +16,12 @@
 
 class AbstractEnemy {
  private:
-    
- public:
+    int health;
 
+ public:
+    int getHealth();
+    void setHealth(int);
+
+    virtual std::string encounterMessage() = 0;
 };
 #endif
