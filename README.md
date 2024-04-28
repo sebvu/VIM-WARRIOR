@@ -2,15 +2,6 @@
 
 # Dungeon Adventure!
 
-**MID PROJECT REPORT**
+- Welcome to Dungeon Adventure! A text-based adventure game where you can explore a dungeon, fight monsters, and collect loot.
 
-PSID: 2282513
-Name: Jester Santos
-
-- Welcome to Dungeon Adventure! A terminal-built dungeon fantasy game built fully in C++.
-
-## Design of three classes (35%)
-
-## Show relationship among classes (25%)
-
-## Provided use-cases for project (40%)
+- This project is created due to the my college course, however the idea in general is purely my love. 💜 
