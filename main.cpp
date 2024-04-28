@@ -1,13 +1,13 @@
 #include "./include/colors.h"
-#include <chrono>
+#include "./include/exception.h"
 #include <fstream>
 #include <iostream>
 #include <limits>
-#include <thread>
 #include <random>
+#include <thread>
 
 // Global ANSI Escape Codes
-Color color;
+const Color color;
 
 void printSword() {  // Prints out sword ASCII
     std::cout << color.BOLD << "      [|_________________" << std::endl
@@ -16,8 +16,8 @@ void printSword() {  // Prints out sword ASCII
 }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
-    auto two_seconds = std::chrono::seconds(2);
-    auto one_second = std::chrono::seconds(1);
+    const auto two_seconds = std::chrono::seconds(2);
+    const auto one_second = std::chrono::seconds(1);
 
     std::cout << color.ITALICIZE_BLUE
               << "           The kingdom sent me here to these depths.."
@@ -85,7 +85,7 @@ void titleScreen() {
         << "(\\ _ /)\n(=t.t=)" << color.NC << std::endl
         << std::flush;
 
-    auto six_seconds =
+    const auto six_seconds =
         std::chrono::seconds(6);  // allow time for preface to be read
 
     std::this_thread::sleep_for(six_seconds);
@@ -104,7 +104,7 @@ int startOptions() {
     std::cout << "     " << color.UNDERLINE << color.BOLD_RED
               << "Dungeon Warrior" << color.NC << std::endl;
     // Start Menu
-    int choice;
+    int choice = 0;
     while (true) {
         std::cout << "(1) New Game" << std::endl
                   << "(2) Load Game" << std::endl
@@ -129,6 +129,15 @@ int startOptions() {
     }
 }
 
+std::string appendFileDirectory(const std::string fileInput) {
+    // append directory and .txt
+    std::string saveGameDirectory = "./savedGames/";
+
+    saveGameDirectory.append(fileInput).append(".txt");
+
+    return saveGameDirectory;
+}
+
 void programExit() {
     std::cout << color.UNDERLINE << color.BOLD_CYAN << "EXITING CREDITS"
               << color.NC << std::endl
@@ -136,6 +145,12 @@ void programExit() {
     std::cout << color.BOLD_GREEN << "Thank you for playing Dungeon Warrior!"
               << std::endl;
     // utilizing raw string literals for ASCII art
+    /*
+
+       ‼️  BE SURE TO INCLUDE SAVE GAME BEFORE EXITING
+        DELETE ONCE IMPLEMENTED
+
+    */
     std::cout << R"(
       ／l、             
     （ﾟ､ ｡ ７   Creator: Jester 💜  
@@ -145,6 +160,63 @@ void programExit() {
               << std::endl;
     // exit code 0, no errors!!
     exit(0);
+}
+
+void printCurrentSaveFiles() {
+    /*
+    ‼️  IMPLEMENT PRINTING OUT A LIST OF CURRENT SAVES FILES ALONG WITH DATE
+    */
+}
+
+void saveGame() {
+    // prompt user for save file name
+    std::string savedFileName = "";
+    std::cout << "Enter a name for your save file: ";
+    std::cin >> savedFileName;
+    std::string saveGameDirectory = appendFileDirectory(savedFileName);
+    // create a save file in savedGames directory
+    std::ofstream saveFile(saveGameDirectory);
+
+    try {
+        if (!saveFile.is_open()) {  // verify if file is open
+            throw fileNotOpen(saveGameDirectory);
+        }
+    } catch (fileNotOpen &exec) {
+        std::cerr << "Error: File could not be saved at" << exec.getFileName();
+        std::cerr << "Please try again." << std::endl;
+        saveGame();
+    }
+    /*
+       ‼️  IMPLEMENT SAVE DATA HERE
+        DELETE ONCE IMPLEMENTED
+    */
+}
+
+void loadGame() {
+    // Receive saveFile from user
+    std::string loadedSaveFile = "";
+    std::cout << "Please input a save file to load: ";
+    printCurrentSaveFiles();  // load current save files
+    std::cin >> loadedSaveFile;
+
+    std::string saveGameDirectory = appendFileDirectory(loadedSaveFile);
+
+    // load file save below
+    std::ifstream loadFile(saveGameDirectory);
+
+    try {
+        if (!loadFile.is_open()) {
+            throw fileNotOpen(saveGameDirectory);
+        }
+    } catch (fileNotOpen exec) {
+        std::cerr << "Error: File not open: " << exec.getFileName();
+        std::cerr << "Please choose another file." << std::endl;
+        loadGame();
+    }
+    /*
+       ‼️  IMPLEMENT LOAD DATA HERE
+        DELETE ONCE IMPLEMENTED
+    */
 }
 
 int main() {
