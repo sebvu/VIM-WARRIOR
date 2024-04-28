@@ -2,7 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <random>
-#include <thread>
+#include <chrono>
+#include <fstream>
 
 // Global ANSI Escape Codes
 Color color;
@@ -141,6 +142,7 @@ void programExit() {
       じしf_,)ノ
     )" << color.NC
               << std::endl;
+    // exit code 0, no errors!!
     exit(0);
 }
 
@@ -150,13 +152,13 @@ int main() {
     int option = startOptions();
 
     switch (option) {
-    case (1):
+    case (1):  // New Game
         std::cout << "Switch case 1" << std::endl;
         break;
-    case (2):
+    case (2):  // Load Game
         std::cout << "Switch case 2" << std::endl;
         break;
-    case (3):
+    case (3):  // Exit
         std::cout << std::endl << std::endl;
         programExit();
         break;

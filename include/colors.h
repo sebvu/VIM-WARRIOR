@@ -2,6 +2,7 @@
 #define COLORS_H
 
 #include <iostream>
+#include <string>
 
 // Definition in colors.cpp
 
