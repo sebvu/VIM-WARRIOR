@@ -1,9 +1,10 @@
 #include "./include/colors.h"
-#include <iostream>
-#include <limits>
-#include <random>
 #include <chrono>
 #include <fstream>
+#include <iostream>
+#include <limits>
+#include <thread>
+#include <random>
 
 // Global ANSI Escape Codes
 Color color;
