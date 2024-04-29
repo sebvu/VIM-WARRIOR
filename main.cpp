@@ -295,7 +295,7 @@ void programExit() {
     )" << color.NC
               << std::endl;
     // exit code 0, no errors!!
-    exit(0);
+    exit(1);
 }
 
 void printCurrentSaveFiles() {
@@ -314,7 +314,7 @@ void printCurrentSaveFiles() {
                   << std::endl
                   << "TERMINATING PROGRAM." << std::endl
                   << std::endl;
-        exit(1);  // Fatal Program Error
+       exit(0);  // Fatal Program Error
     }
 
     std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
@@ -525,7 +525,7 @@ void newGame() {
 }
 
 int main() {
-    // titleScreen();  // Initialize title screen
+    titleScreen();  // Initialize title screen
 
     while (true) {
         int option = startOptions();
