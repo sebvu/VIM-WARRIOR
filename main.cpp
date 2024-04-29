@@ -518,10 +518,17 @@ void deleteSavedGame() {
 }
 
 void newGame() {
+    std::cout << "STARTING NEW GAME" << std::endl;
     /*
         ‼️  IMPLEMENT NEW GAME HERE
             DELETE ONCE IMPLEMENTED
     */
+
+    std::cout << "Loading .";
+    for (int i = 0; i < 3; i++) {
+        setTime.seconds(1);
+        std::cout << ". ";
+    }
 }
 
 int main() {
@@ -534,7 +541,7 @@ int main() {
 
         switch (option) {
         case (1):  // New Game
-            // newGame();
+            newGame();
             break;
         case (2):  // Load Game
             loadGame();
