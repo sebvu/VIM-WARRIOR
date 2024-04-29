@@ -5,6 +5,7 @@
 */
 #include "./include/colors.h"
 #include "./include/exception.h"
+#include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -115,7 +116,8 @@ int startOptions() {
         std::cout << "(1) New Game" << std::endl
                   << "(2) Load Game" << std::endl
                   << "(3) Save Game" << std::endl
-                  << "(4) Exit" << std::endl
+                  << "(4) Delete Saved Game" << std::endl
+                  << "(5) Exit" << std::endl
                   << std::endl
                   << "Enter your choice: ";
         if (std::cin >> choice) {
@@ -140,7 +142,7 @@ bool is_empty_file(std::ifstream &pFile) {
     return pFile.peek() == std::ifstream::traits_type::eof();
 }
 
-std::string appendFileDirectory(const std::string fileInput) {
+std::string appendFileDirectory(const std::string &fileInput) {
     // append directory and .txt
     std::string saveGameDirectory = "./savedGames/";
 
@@ -149,7 +151,8 @@ std::string appendFileDirectory(const std::string fileInput) {
     return saveGameDirectory;
 }
 
-void fileToTrackerFormat(std::ofstream &outputTracker, std::string fileName) {
+void fileToTrackerFormat(std::ofstream &outputTracker,
+                         const std::string &fileName) {
     // get current current date
     time_t now = time(0);
 
@@ -166,9 +169,53 @@ void fileToTrackerFormat(std::ofstream &outputTracker, std::string fileName) {
                   << std::endl;  // append filename and date at end of tracker
 }
 
-void addFileToTracker(std::string fileName) {
+void rewriteTrackedWithoutSpecifiedFile(const std::string &fileName) {
+    std::string fileLine = "";
+    std::string tempFile = "temporaryStorage.txt";
+    std::string fileTracker = "trackedGameFiles.txt";
+    // rewrite trackedGamesFile.txt without specified file
+    // create temporary file to rewrite old content in,
+    // then write temporary in to original fileTracker
+    // delete temporary file in the end
+    std::ofstream tempWriteFile(tempFile);
+    if (!tempWriteFile.is_open()) {
+        throw fileNotOpen(tempFile);
+    }
+    std::ifstream newInputTracker(fileTracker);
+    if (!newInputTracker.is_open()) {
+        throw fileNotOpen(fileTracker);
+    }
+    // re-add to NEW overwritten fileTracker
+    while (getline(newInputTracker, fileLine)) {
+        int delimeter = fileLine.find("-");  // return index of -
+        std::string oldFileName =
+            fileLine.substr(delimeter + 2, fileLine.size());
+        if (fileName != oldFileName) {
+            tempWriteFile << fileLine << std::endl;
+        }
+    }
+    std::ifstream readTempWriteFile(tempFile);
+    if (!readTempWriteFile.is_open()) {
+        throw fileNotOpen(tempFile);
+    }
+    std::ofstream overWriteFile(fileTracker);
+    if (!overWriteFile.is_open()) {
+        throw fileNotOpen(fileTracker);
+    }
+    while (getline(readTempWriteFile, fileLine)) {
+        overWriteFile << fileLine << std::endl;
+    }
+    tempWriteFile.close();
+    readTempWriteFile.close();
+    overWriteFile.close();
+    const char *c = tempFile.c_str();
+    remove(c);  // delete temporary file
+}
 
-    std::string fileTracker = "trackedGameFiles.txt";  // root proj. directory
+void addFileToTracker(const std::string &fileName) {
+
+    const std::string fileTracker =
+        "trackedGameFiles.txt";  // root proj. directory
     // appending to file
     std::ifstream inputTracker(fileTracker);
     try {
@@ -187,47 +234,7 @@ void addFileToTracker(std::string fileName) {
             std::string oldFileName = fileLine.substr(
                 delimeter + 2, fileLine.size());  // pull oldFileName
             if (oldFileName == fileName) {
-                std::string tempFile = "temporaryStorage.txt";
-                std::cout << "MATCH FOUND" << std::endl;
-                std::cout << oldFileName << " == " << fileName << std::endl;
-                // rewrite file without specific saved file
-                // create temporary file to rewrite old content in,
-                // then write temporary in to original fileTracker
-                // delete temporary file in the end
-                std::ofstream tempWriteFile(tempFile);
-                if (!tempWriteFile.is_open()) {
-                    throw fileNotOpen(tempFile);
-                }
-                std::ifstream newInputTracker(fileTracker);
-                if (!newInputTracker.is_open()) {
-                    throw fileNotOpen(fileTracker);
-                }
-                while (getline(newInputTracker, fileLine)) {
-                    std::cout << "CURRENT FILENAME: " << fileName << std::endl;
-                    oldFileName =
-                        fileLine.substr(delimeter + 2, fileLine.size());
-                    std::cout << "CURRENT OLDFILENAME: " << oldFileName
-                              << std::endl;
-                    if (fileName != oldFileName) {
-                        std::cout << "OLD FILE NAME HAS BEEN ADDED"
-                                  << std::endl;
-                        tempWriteFile << fileLine << std::endl;
-                    }
-                }
-                std::ifstream readTempWriteFile("temporaryStorage.txt");
-                if (!readTempWriteFile.is_open()) {
-                    throw fileNotOpen(tempFile);
-                }
-                std::ofstream overWriteFile(fileTracker);
-                if (!overWriteFile.is_open()) {
-                    throw fileNotOpen(fileTracker);
-                }
-                while (getline(readTempWriteFile, fileLine)) {
-                    overWriteFile << fileLine << std::endl;
-                }
-                tempWriteFile.close();
-                readTempWriteFile.close();
-                overWriteFile.close();
+                rewriteTrackedWithoutSpecifiedFile(fileName);
                 break;
             }
         }
@@ -276,7 +283,8 @@ void programExit() {
 }
 
 void printCurrentSaveFiles() {
-    std::string fileTracker = "trackedGameFiles.txt";  // root proj. directory
+    const std::string fileTracker =
+        "trackedGameFiles.txt";  // root proj. directory
     std::ifstream tracker(fileTracker);
 
     try {
@@ -366,38 +374,45 @@ void saveGame() {
 
 void loadGame() {
     // Receive saveFile from user
-    std::string loadedSaveFile = "";
-    std::ifstream tracker("trackedGameFiles.txt");
-    if (is_empty_file(tracker)) {
-        std::cout << "==========LIST OF SAVED FILES==========" << std::endl
-                  << std::endl
-                  << "No saved files found." << std::endl
-                  << std::endl
-                  << "=======================================" << std::endl;
-        tracker.close();
-        return;
-    }
-    tracker.close();
-    printCurrentSaveFiles();  // load current save files
-    std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
-    std::cout << "Enter the name of the save file you wish to load: ";
-    std::cin >> loadedSaveFile;
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    if (loadedSaveFile == "exit") {
-        return;
-    }
-
-    std::string saveGameDirectory = appendFileDirectory(loadedSaveFile);
-
-    // load file save below
-    std::ifstream loadFile(saveGameDirectory);
-
     try {
+        std::string loadedSaveFile = "";
+        const std::string trackedSaves = "trackedGameFiles.txt";
+        std::ifstream tracker(trackedSaves);
+        if (is_empty_file(tracker)) {
+            std::cout << "==========LIST OF SAVED FILES==========" << std::endl
+                      << std::endl
+                      << "No saved files found." << std::endl
+                      << std::endl
+                      << "=======================================" << std::endl;
+            tracker.close();
+            return;
+        }
+        tracker.close();
+        printCurrentSaveFiles();  // load current save files
+        std::cout << ">> SAVE GAME << " << std::endl;
+        std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
+        std::cout << "Enter the name of the save file you wish to load: ";
+        std::cin >> loadedSaveFile;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        if (loadedSaveFile == "exit") {
+            return;
+        }
+
+        std::string saveGameDirectory = appendFileDirectory(loadedSaveFile);
+
+        // load file save below
+        std::ifstream loadFile(saveGameDirectory);
+
         if (!loadFile.is_open()) {
             throw fileNotOpen(saveGameDirectory);
         }
+        /*
+           ‼️  IMPLEMENT LOAD DATA HERE
+            DELETE ONCE IMPLEMENTED
+        */
+        loadFile.close();
     } catch (fileNotOpen exec) {
         std::cerr << std::endl
                   << std::endl
@@ -406,14 +421,44 @@ void loadGame() {
                   << std::endl;
         loadGame();
     }
-    /*
-       ‼️  IMPLEMENT LOAD DATA HERE
-        DELETE ONCE IMPLEMENTED
-    */
-    loadFile.close();
 }
 
-void deleteSavedGame() {}
+void deleteSavedGame() {
+    // print out list of current files
+    printCurrentSaveFiles();
+
+    std::string input = "";
+    std::cout << ">> DELETE SAVED GAME <<" << std::endl;
+    std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
+    std::cout << "Please enter the saved game you wish to delete: ";
+    std::cin >> input;
+    if (input == "exit")
+        return;
+
+    try {
+        const std::string userInputFile = appendFileDirectory(input);
+        // concert to const char * for remove
+        const char *c = userInputFile.c_str();
+        std::ifstream trackedFiles(userInputFile);
+        if (!trackedFiles.is_open()) {
+            throw fileNotOpen(userInputFile);
+        } else if (std::remove(c) == 0) {
+            rewriteTrackedWithoutSpecifiedFile(input);
+            std::cout << "Saved game was successfully deleted." << std::endl;
+        } else {
+            std::cout << "Saved game was NOT deleted." << std::endl;
+        }
+        trackedFiles.close();
+    } catch (fileNotOpen &exec) {
+        std::cerr << std::endl
+                  << std::endl
+                  << "(" << exec.getFileName() << ") is not a saved file."
+                  << std::endl
+                  << "Please try again." << std::endl
+                  << std::endl;
+        deleteSavedGame();
+    }
+}
 
 void newGame() {
     /*
@@ -448,7 +493,7 @@ int main() {
             deleteSavedGame();
             break;
         case (5):  // Exit
-            std::cout << "Switch case 4: Exit Game" << std::endl;
+            std::cout << "Switch case 5: Exit Game" << std::endl;
             /*
                ‼️  FOR EXITING, IMPLEMENT A 'BUFFER'
                IN WHICH A BUFFER BASICALLY CHECKS IF THERE IS STILL DATA
