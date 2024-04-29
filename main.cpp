@@ -5,45 +5,57 @@
 */
 #include "./include/colors.h"
 #include "./include/exception.h"
+#include "./include/times.h"
 #include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <random>
-#include <thread>
 
-// Global ANSI Escape Codes
+// ANSI Escape Codes for Color Control
 const Color color;
+// Struct for Easy Time Control
+Time setTime;
 
 void printSword() {  // Prints out sword ASCII
-    std::cout << color.BOLD << "      [|_________________" << std::endl
-              << "0|===|<>_________________>" << std::endl
-              << "      [|" << color.NC << std::endl;
+    std::cout << color.BOLD_RED << R"(
+            ()
+            )(
+         o======o
+            ||    
+            ||
+            ||
+)" << color.NC << color.ORANGE
+
+              << R"(       ,c88888888b
+      ,88888888888b
+      88888888888Y"
+)" << color.GREEN
+              << R"(,,;,,;;)" << color.ORANGE << R"("Y888888Y")" << color.GREEN
+              << R"(,,,,,,,;;,;
+    )";
 }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
-    const auto two_seconds = std::chrono::seconds(2);
-    const auto one_second = std::chrono::seconds(1);
-
     std::cout << color.ITALICIZE_BLUE
               << "           The kingdom sent me here to these depths.."
               << std::endl
               << std::endl;
 
-    std::this_thread::sleep_for(two_seconds);
+    setTime.seconds(2);
 
     std::cout << color.ITALICIZE_LIGHTGRAY << "...I know nothing else"
               << std::endl
               << std::endl;
 
-    std::this_thread::sleep_for(two_seconds);
+    setTime.seconds(2);
 
-    std::cout << color.ITALICIZE_PURPLE << "               But to serve."
+    std::cout << color.ITALICIZE_BLACK << "               But to serve."
               << std::endl
               << std::endl;
 
-    std::this_thread::sleep_for(two_seconds);
+    setTime.seconds(2);
 
     std::cout << color.ITALICIZE_RED << "       As a " << color.BOLD
               << "warrior." << std::endl;
@@ -64,7 +76,7 @@ void beginningScreenSequence() {  // beginning animation-ish sequence
                 std::cout << " ";
             }
             std::cout << std::flush;
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            setTime.milliseconds(5);
         }
         std::cout << std::endl;
     }
@@ -92,10 +104,7 @@ void titleScreen() {
         << "(\\ _ /)\n(=t.t=)" << color.NC << std::endl
         << std::flush;
 
-    const auto six_seconds =
-        std::chrono::seconds(6);  // allow time for preface to be read
-
-    std::this_thread::sleep_for(six_seconds);
+    setTime.seconds(6);
     std::cout << std::endl << std::endl;
 
     beginningScreenSequence();
@@ -113,18 +122,25 @@ int startOptions() {
     // Start Menu
     int choice = 0;
     while (true) {
-        std::cout << "(1) New Game" << std::endl
-                  << "(2) Load Game" << std::endl
-                  << "(3) Save Game" << std::endl
-                  << "(4) Delete Saved Game" << std::endl
-                  << "(5) Exit" << std::endl
+        std::cout << color.NC << color.PURPLE << "(" << color.BOLD_ORANGE << "1"
+                  << color.NC << color.PURPLE << ") New Game" << std::endl
+                  << "(" << color.BOLD_ORANGE << "2" << color.NC << color.PURPLE
+                  << ") Load Game" << std::endl
+                  << "(" << color.BOLD_ORANGE << "3" << color.NC << color.PURPLE
+                  << ") Save Game" << std::endl
+                  << "(" << color.BOLD_ORANGE << "4" << color.NC << color.PURPLE
+                  << ") Delete Saved Game" << std::endl
+                  << "(" << color.BOLD_ORANGE << "5" << color.NC << color.PURPLE
+                  << ") Exit" << std::endl
                   << std::endl
-                  << "Enter your choice: ";
+                  << "Enter your choice: " << color.BOLD_CYAN;
         if (std::cin >> choice) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << color.NC << std::endl;
 
-            if (choice == 1 || choice == 2 || choice == 3 || choice == 4) {
+            if (choice == 1 || choice == 2 || choice == 3 || choice == 4 ||
+                choice == 5) {
                 return choice;
             } else {
                 std::cout << "Not an option!" << std::endl;
@@ -301,17 +317,22 @@ void printCurrentSaveFiles() {
         exit(1);  // Fatal Program Error
     }
 
-    std::cout << "==========LIST OF SAVED FILES==========" << std::endl
+    std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
+              << "LIST OF SAVED FILES" << color.NC << color.PURPLE
+              << "==========" << std::endl
               << std::endl
-              << "MM/DD/YYYY" << std::endl
+              << color.GREEN << "MM/DD/YYYY HH:MM - FileName " << color.NC
+              << std::endl
               << std::endl;
     // print out all current saved files
     std::string savedFile = "";
     while (getline(tracker, savedFile)) {  // file, string
-        std::cout << savedFile << std::endl;
+        std::cout << color.GREEN << savedFile << std::endl;
     }
     std::cout << std::endl;
-    std::cout << "=======================================" << std::endl
+    std::cout << color.PURPLE
+              << "=======================================" << color.NC
+              << std::endl
               << std::endl;
 }
 
@@ -319,18 +340,25 @@ void saveGame() {
     // prompt user for save file name
     std::string savedFileName = "";
     printCurrentSaveFiles();
-    std::cout << ">> SAVE GAME << " << std::endl;
-    std::cout << "- Naming over an existing file will overwrite the file."
+    std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE << " SAVE GAME "
+              << color.NC << color.PURPLE << "<<" << std::endl;
+    std::cout << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+              << "Naming over an existing file will overwrite the file."
               << std::endl
-              << "- Save files are stored in the 'savedGames' directory."
+              << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+              << "Save files are stored in the 'savedGames' directory."
               << std::endl
-              << "- Cannot contain . or /" << std::endl
-              << "- Must be 3 - 10 characters" << std::endl;
+              << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+              << "Cannot contain . or /" << std::endl
+              << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+              << "Must be 3 - 10 characters" << std::endl
+              << std::endl;
     std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
-    std::cout << "Enter a name for your save file: ";
+    std::cout << "Enter a name for your save file: " << color.BOLD_CYAN;
     std::cin >> savedFileName;
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << color.NC << std::endl;
 
     try {
         if (savedFileName == "exit") {
@@ -379,22 +407,29 @@ void loadGame() {
         const std::string trackedSaves = "trackedGameFiles.txt";
         std::ifstream tracker(trackedSaves);
         if (is_empty_file(tracker)) {
-            std::cout << "==========LIST OF SAVED FILES==========" << std::endl
+            std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
+                      << "LIST OF SAVED FILES" << color.NC << color.PURPLE
+                      << "==========" << std::endl
                       << std::endl
                       << "No saved files found." << std::endl
                       << std::endl
-                      << "=======================================" << std::endl;
+                      << "=======================================" << color.NC
+                      << std::endl;
             tracker.close();
             return;
         }
         tracker.close();
         printCurrentSaveFiles();  // load current save files
-        std::cout << ">> SAVE GAME << " << std::endl;
+        std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE << " LOAD GAME "
+                  << color.NC << color.PURPLE << "<<" << std::endl
+                  << std::endl;
         std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
-        std::cout << "Enter the name of the save file you wish to load: ";
+        std::cout << "Enter the name of the save file you wish to load: "
+                  << color.BOLD_CYAN;
         std::cin >> loadedSaveFile;
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << color.NC << std::endl;
 
         if (loadedSaveFile == "exit") {
             return;
@@ -425,13 +460,35 @@ void loadGame() {
 
 void deleteSavedGame() {
     // print out list of current files
+    const std::string trackedSaves = "trackedGameFiles.txt";
+    std::ifstream tracker(trackedSaves);
+    if (is_empty_file(tracker)) {
+        std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
+                  << "LIST OF SAVED FILES" << color.NC << color.PURPLE
+                  << "==========" << std::endl
+                  << std::endl
+                  << "No saved files found." << std::endl
+                  << std::endl
+                  << "=======================================" << color.NC
+                  << std::endl;
+        tracker.close();
+        return;
+    }
+    tracker.close();
     printCurrentSaveFiles();
 
     std::string input = "";
-    std::cout << ">> DELETE SAVED GAME <<" << std::endl;
+    std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE
+              << " DELETE SAVED GAME " << color.NC << color.PURPLE << "<<"
+              << std::endl
+              << std::endl;
     std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
-    std::cout << "Please enter the saved game you wish to delete: ";
+    std::cout << "Please enter the saved game you wish to delete: "
+              << color.BOLD_CYAN;
     std::cin >> input;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << color.NC << std::endl;
     if (input == "exit")
         return;
 
@@ -477,23 +534,18 @@ int main() {
 
         switch (option) {
         case (1):  // New Game
-            std::cout << "Switch case 1: New Game" << std::endl;
             // newGame();
             break;
         case (2):  // Load Game
-            std::cout << "Switch case 2: Load Game" << std::endl;
             loadGame();
             break;
         case (3):  // Save Game
-            std::cout << "Switch case 3: Save Game" << std::endl;
             saveGame();
             break;
         case (4):  // Delete Saved Game
-            std::cout << "Switch case 4: Delete Saved Game" << std::endl;
             deleteSavedGame();
             break;
         case (5):  // Exit
-            std::cout << "Switch case 5: Exit Game" << std::endl;
             /*
                ‼️  FOR EXITING, IMPLEMENT A 'BUFFER'
                IN WHICH A BUFFER BASICALLY CHECKS IF THERE IS STILL DATA

@@ -14,7 +14,7 @@ struct Color {
     std::string UNDERLINE = "\033[4m";  // underlining
 
     // default
-    std::string BLACK = "\033[30m";      // black coloring
+    std::string BLACK = "\033[90m";      // black coloring
     std::string RED = "\033[31m";        // red coloring
     std::string GREEN = "\033[32m";      // green coloring
     std::string ORANGE = "\033[33m";     // orange coloring
@@ -24,7 +24,7 @@ struct Color {
     std::string LIGHTGRAY = "\033[37m";  // lightgray coloring
 
     // bold
-    std::string BOLD_BLACK = "\033[1;30m";
+    std::string BOLD_BLACK = "\033[1;90m";
     std::string BOLD_RED = "\033[1;31m";
     std::string BOLD_GREEN = "\033[1;32m";
     std::string BOLD_ORANGE = "\033[1;33m";
@@ -34,7 +34,7 @@ struct Color {
     std::string BOLD_LIGHTGRAY = "\033[1;37m";
 
     // italicize
-    std::string ITALICIZE_BLACK = "\033[3;30m";
+    std::string ITALICIZE_BLACK = "\033[3;90m";
     std::string ITALICIZE_RED = "\033[3;31m";
     std::string ITALICIZE_GREEN = "\033[3;32m";
     std::string ITALICIZE_ORANGE = "\033[3;33m";
@@ -44,7 +44,7 @@ struct Color {
     std::string ITALICIZE_LIGHTGRAY = "\033[3;37m";
 
     // underline
-    std::string UNDERLINE_BLACK = "\033[4;30m";
+    std::string UNDERLINE_BLACK = "\033[4;90m";
     std::string UNDERLINE_RED = "\033[4;31m";
     std::string UNDERLINE_GREEN = "\033[4;32m";
     std::string UNDERLINE_ORANGE = "\033[4;33m";
