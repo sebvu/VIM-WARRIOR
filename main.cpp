@@ -3,15 +3,18 @@
     0 - Successful exit
     1 - Fatal program error
 */
-#include "./include/colors.h"
-#include "./include/exception.h"
-#include "./include/times.h"
+#include "./include/Colors.h"
+#include "./include/Exception.h"
+#include "./include/Times.h"
 #include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <ostream>
 #include <random>
+#include <string>
+// #include <iomanip>
 
 // ANSI Escape Codes for Color Control
 const Color color;
@@ -143,18 +146,25 @@ int startOptions() {
                 choice == 5) {
                 return choice;
             } else {
-                std::cout << "Not an option!" << std::endl;
+                std::cout << color.BOLD_ORANGE << "Not an option!" << color.NC
+                          << color.PURPLE << std::endl;
                 continue;
             }
         } else {
-            std::cout << "Invalid input type, please try again." << std::endl;
+            std::cout << color.BOLD_ORANGE
+                      << "Invalid input type, please try again." << color.NC
+                      << color.PURPLE << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
 }
 
-bool is_empty_file(std::ifstream &pFile) {
+bool isEmptyFile(std::ifstream &pFile, const std::string &fileName) {
+    // check if file exists first
+    if (!pFile.is_open()) {
+        throw essentialFileNotOpen(fileName);
+    }
     return pFile.peek() == std::ifstream::traits_type::eof();
 }
 
@@ -195,11 +205,11 @@ void rewriteTrackedWithoutSpecifiedFile(const std::string &fileName) {
     // delete temporary file in the end
     std::ofstream tempWriteFile(tempFile);
     if (!tempWriteFile.is_open()) {
-        throw fileNotOpen(tempFile);
+        throw essentialFileNotOpen(tempFile);
     }
     std::ifstream newInputTracker(fileTracker);
     if (!newInputTracker.is_open()) {
-        throw fileNotOpen(fileTracker);
+        throw essentialFileNotOpen(fileTracker);
     }
     // re-add to NEW overwritten fileTracker
     while (getline(newInputTracker, fileLine)) {
@@ -212,11 +222,11 @@ void rewriteTrackedWithoutSpecifiedFile(const std::string &fileName) {
     }
     std::ifstream readTempWriteFile(tempFile);
     if (!readTempWriteFile.is_open()) {
-        throw fileNotOpen(tempFile);
+        throw essentialFileNotOpen(tempFile);
     }
     std::ofstream overWriteFile(fileTracker);
     if (!overWriteFile.is_open()) {
-        throw fileNotOpen(fileTracker);
+        throw essentialFileNotOpen(fileTracker);
     }
     while (getline(readTempWriteFile, fileLine)) {
         overWriteFile << fileLine << std::endl;
@@ -234,44 +244,34 @@ void addFileToTracker(const std::string &fileName) {
         "trackedGameFiles.txt";  // root proj. directory
     // appending to file
     std::ifstream inputTracker(fileTracker);
-    try {
-        if (!inputTracker.is_open()) {
-            throw fileNotOpen(fileTracker);
-        }
-
-        std::string fileLine = "";
-        // overwrite file copies
-        while (getline(inputTracker, fileLine)) {
-            // using delimeter " - ", we can pull file name exclusively
-            // and compare to check if file exists. if file exists, delete old
-            // file off of tracker.
-            // return FIRST occurence pos. of -
-            int delimeter = fileLine.find("-");
-            std::string oldFileName = fileLine.substr(
-                delimeter + 2, fileLine.size());  // pull oldFileName
-            if (oldFileName == fileName) {
-                rewriteTrackedWithoutSpecifiedFile(fileName);
-                break;
-            }
-        }
-        inputTracker.close();
-        // append newFile
-        std::ofstream outputTracker(fileTracker, std::ios::app);
-        if (!outputTracker.is_open()) {
-            throw fileNotOpen(fileTracker);
-        }
-        // add original file to end
-        fileToTrackerFormat(outputTracker, fileName);
-        outputTracker.close();
-    } catch (fileNotOpen &exec) {
-        std::cerr << std::endl
-                  << std::endl
-                  << "FATAL ERROR: " << exec.getFileName() << " NOT FOUND"
-                  << std::endl
-                  << "TERMINATING PROGRAM." << std::endl
-                  << std::endl;
-        exit(1);  // Fatal Program Error
+    if (!inputTracker.is_open()) {
+        throw essentialFileNotOpen(fileTracker);
     }
+
+    std::string fileLine = "";
+    // overwrite file copies
+    while (getline(inputTracker, fileLine)) {
+        // using delimeter " - ", we can pull file name exclusively
+        // and compare to check if file exists. if file exists, delete old
+        // file off of tracker.
+        // return FIRST occurence pos. of -
+        int delimeter = fileLine.find("-");
+        std::string oldFileName = fileLine.substr(
+            delimeter + 2, fileLine.size());  // pull oldFileName
+        if (oldFileName == fileName) {
+            rewriteTrackedWithoutSpecifiedFile(fileName);
+            break;
+        }
+    }
+    inputTracker.close();
+    // append newFile
+    std::ofstream outputTracker(fileTracker, std::ios::app);
+    if (!outputTracker.is_open()) {
+        throw essentialFileNotOpen(fileTracker);
+    }
+    // add original file to end
+    fileToTrackerFormat(outputTracker, fileName);
+    outputTracker.close();
 }
 
 void programExit() {
@@ -303,18 +303,8 @@ void printCurrentSaveFiles() {
         "trackedGameFiles.txt";  // root proj. directory
     std::ifstream tracker(fileTracker);
 
-    try {
-        if (!tracker.is_open()) {
-            throw fileNotOpen(fileTracker);
-        }
-    } catch (fileNotOpen &exec) {
-        std::cerr << std::endl
-                  << std::endl
-                  << "FATAL ERROR: " << exec.getFileName() << " NOT FOUND"
-                  << std::endl
-                  << "TERMINATING PROGRAM." << std::endl
-                  << std::endl;
-        exit(1);  // Fatal Program Error
+    if (!tracker.is_open()) {
+        throw essentialFileNotOpen(fileTracker);
     }
 
     std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
@@ -338,75 +328,66 @@ void printCurrentSaveFiles() {
 
 void saveGame() {
     // prompt user for save file name
-    std::string savedFileName = "";
-    printCurrentSaveFiles();
-    std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE << " SAVE GAME "
-              << color.NC << color.PURPLE << "<<" << std::endl;
-    std::cout << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
-              << "Naming over an existing file will overwrite the file."
-              << std::endl
-              << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
-              << "Save files are stored in the 'savedGames' directory."
-              << std::endl
-              << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
-              << "Cannot contain . or /" << std::endl
-              << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
-              << "Must be 3 - 10 characters" << std::endl
-              << std::endl;
-    std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
-    std::cout << "Enter a name for your save file: " << color.BOLD_CYAN;
-    std::cin >> savedFileName;
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << color.NC << std::endl;
+    while (true) {
+        std::string savedFileName = "";
+        printCurrentSaveFiles();
+        std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE << " SAVE GAME "
+                  << color.NC << color.PURPLE << "<<" << std::endl;
+        std::cout << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+                  << "Naming over an existing file will overwrite the file."
+                  << std::endl
+                  << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+                  << "Save files are stored in the 'savedGames' directory."
+                  << std::endl
+                  << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+                  << "Cannot contain . or /" << std::endl
+                  << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
+                  << "Must be 3 - 10 characters" << std::endl
+                  << std::endl;
+        std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
+        std::cout << "Enter a name for your save file: " << color.BOLD_CYAN;
+        std::cin >> savedFileName;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << color.NC << std::endl;
 
-    try {
         if (savedFileName == "exit") {
             return;
         } else if (savedFileName.find(".") != std::string::npos ||
                    savedFileName.find("/") != std::string::npos ||
                    savedFileName.size() < 3 || savedFileName.size() > 10) {
-            throw invalidFileName(savedFileName);
-        }
-        std::string saveGameDirectory = appendFileDirectory(savedFileName);
-        // create a save file in savedGames directory
-        std::ofstream saveFile(saveGameDirectory);
+            std::cout << color.BOLD_ORANGE << savedFileName
+                      << " is not a valid save file name! Please try again."
+                      << std::endl
+                      << color.NC << std::endl;
+        } else {
+            std::string saveGameDirectory = appendFileDirectory(savedFileName);
+            // create a save file in savedGames directory
+            std::ofstream saveFile(saveGameDirectory);
 
-        if (!saveFile.is_open()) {  // verify if file is open
-            throw fileNotOpen(saveGameDirectory);
-        }
+            if (!saveFile.is_open()) {  // verify if file is open
+                throw essentialFileNotOpen(saveGameDirectory);
+            }
 
-        // track current file
-        addFileToTracker(savedFileName);
-        /*
-           ‼️  IMPLEMENT SAVE DATA HERE
-            DELETE ONCE IMPLEMENTED
-        */
-        saveFile.close();
-    } catch (fileNotOpen &exec) {
-        std::cerr << std::endl
-                  << std::endl
-                  << "Error: File could not be saved at (" << exec.getFileName()
-                  << "). Please try again." << std::endl
-                  << std::endl;
-        saveGame();
-    } catch (invalidFileName &exec) {
-        std::cerr << std::endl
-                  << std::endl
-                  << "Error: Invalid file name (" << exec.getFileName()
-                  << "). Please try again." << std::endl
-                  << std::endl;
-        saveGame();
+            // track current file
+            addFileToTracker(savedFileName);
+            /*
+               ‼️  IMPLEMENT SAVE DATA HERE
+                DELETE ONCE IMPLEMENTED
+            */
+            saveFile.close();
+            break;
+        }
     }
 }
 
 void loadGame() {
     // Receive saveFile from user
-    try {
+    while (true) {
         std::string loadedSaveFile = "";
         const std::string trackedSaves = "trackedGameFiles.txt";
         std::ifstream tracker(trackedSaves);
-        if (is_empty_file(tracker)) {
+        if (isEmptyFile(tracker, trackedSaves)) {
             std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
                       << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                       << "==========" << std::endl
@@ -441,20 +422,16 @@ void loadGame() {
         std::ifstream loadFile(saveGameDirectory);
 
         if (!loadFile.is_open()) {
-            throw fileNotOpen(saveGameDirectory);
+            std::cout << loadedSaveFile
+                      << " is not a save file! Please try again." << std::endl;
+            loadFile.close();
+        } else {
+            /*
+               ‼️  IMPLEMENT LOAD DATA HERE
+                DELETE ONCE IMPLEMENTED
+            */
+            loadFile.close();
         }
-        /*
-           ‼️  IMPLEMENT LOAD DATA HERE
-            DELETE ONCE IMPLEMENTED
-        */
-        loadFile.close();
-    } catch (fileNotOpen exec) {
-        std::cerr << std::endl
-                  << std::endl
-                  << "Error: File not opened at (" << exec.getFileName()
-                  << "). Please try again." << std::endl
-                  << std::endl;
-        loadGame();
     }
 }
 
@@ -462,7 +439,7 @@ void deleteSavedGame() {
     // print out list of current files
     const std::string trackedSaves = "trackedGameFiles.txt";
     std::ifstream tracker(trackedSaves);
-    if (is_empty_file(tracker)) {
+    if (isEmptyFile(tracker, trackedSaves)) {
         std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
                   << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                   << "==========" << std::endl
@@ -492,38 +469,23 @@ void deleteSavedGame() {
     if (input == "exit")
         return;
 
-    try {
-        const std::string userInputFile = appendFileDirectory(input);
-        // concert to const char * for remove
-        const char *c = userInputFile.c_str();
-        std::ifstream trackedFiles(userInputFile);
-        if (!trackedFiles.is_open()) {
-            throw fileNotOpen(userInputFile);
-        } else if (std::remove(c) == 0) {
-            rewriteTrackedWithoutSpecifiedFile(input);
-            std::cout << "Saved game was successfully deleted." << std::endl;
-        } else {
-            std::cout << "Saved game was NOT deleted." << std::endl;
-        }
-        trackedFiles.close();
-    } catch (fileNotOpen &exec) {
-        std::cerr << std::endl
-                  << std::endl
-                  << "(" << exec.getFileName() << ") is not a saved file."
-                  << std::endl
-                  << "Please try again." << std::endl
-                  << std::endl;
-        deleteSavedGame();
+    const std::string userInputFile = appendFileDirectory(input);
+    // concert to const char * for remove
+    const char *c = userInputFile.c_str();
+    std::ifstream trackedFiles(userInputFile);
+    if (!trackedFiles.is_open()) {
+        throw essentialFileNotOpen(userInputFile);
+    } else if (std::remove(c) == 0) {
+        rewriteTrackedWithoutSpecifiedFile(input);
+        std::cout << "Saved game was successfully deleted." << std::endl;
+    } else {
+        std::cout << "Saved game was NOT deleted." << std::endl;
     }
+    trackedFiles.close();
 }
 
 void newGame() {
     std::cout << "STARTING NEW GAME" << std::endl;
-    /*
-        ‼️  IMPLEMENT NEW GAME HERE
-            DELETE ONCE IMPLEMENTED
-    */
-
     std::cout << "Loading .";
     for (int i = 0; i < 3; i++) {
         setTime.seconds(1);
@@ -533,33 +495,40 @@ void newGame() {
 
 int main() {
     // titleScreen();  // Initialize title screen
+    try {
+        while (true) {
+            int option = startOptions();
 
-    while (true) {
-        int option = startOptions();
+            std::cout << std::endl << std::endl;  // spacing
 
-        std::cout << std::endl << std::endl;  // spacing
-
-        switch (option) {
-        case (1):  // New Game
-            newGame();
-            break;
-        case (2):  // Load Game
-            loadGame();
-            break;
-        case (3):  // Save Game
-            saveGame();
-            break;
-        case (4):  // Delete Saved Game
-            deleteSavedGame();
-            break;
-        case (5):  // Exit
-            /*
-               ‼️  FOR EXITING, IMPLEMENT A 'BUFFER'
-               IN WHICH A BUFFER BASICALLY CHECKS IF THERE IS STILL DATA
-               NEEDED TO BE SAVED. IF SO, PROMPT USER TO SAVE GAME
-            */
-            programExit();
-            break;
+            switch (option) {
+            case (1):  // New Game
+                newGame();
+                break;
+            case (2):  // Load Game
+                loadGame();
+                break;
+            case (3):  // Save Game
+                saveGame();
+                break;
+            case (4):  // Delete Saved Game
+                deleteSavedGame();
+                break;
+            case (5):  // Exit
+                /*
+                   ‼️  FOR EXITING, IMPLEMENT A 'BUFFER'
+                   IN WHICH A BUFFER BASICALLY CHECKS IF THERE IS STILL DATA
+                   NEEDED TO BE SAVED. IF SO, PROMPT USER TO SAVE GAME
+                */
+                programExit();
+                break;
+            }
         }
+    } catch (essentialFileNotOpen &exec) {
+        std::cerr << "FATAL ERROR: " << exec.getFileName() << " DOES NOT EXIST."
+                  << std::endl
+                  << std::endl
+                  << "TERMINATING PROGRAM." << std::endl;
+        exit(1);  // fatal error
     }
 }
