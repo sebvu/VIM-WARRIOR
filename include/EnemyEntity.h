@@ -9,27 +9,22 @@
    randomized or intentional.
 */
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef ENEMYENTITY_H
+#define ENEMYENTITY_H
 
+#include "AbstractEntity.h"
 #include <string>
 
-class Entity {  // await more implementation
+class EnemyEntity : public AbstractEntity {  // await more implementation
  private:
-    double health;
-    std::string name;
-    double attackDmg;
+    int threatLevel;
     std::string modifier;
 
  public:
-    double getHealth();
-    void setHealth(double);
+    int getThreatLevel() { return threatLevel; }
+    std::string getModifier() { return modifier; }
 
-    std::string getModifier();
-    std::string getName();
-    void setAttackDmg(double);
-    double getAttackDmg();
-
+    virtual void asciiArt() = 0;          // ascii art
     virtual void encounterMessage() = 0;  // encounterMessage
     virtual void printStats() = 0;        // stat printout
 };

@@ -1,6 +1,9 @@
 #ifndef TIMES_H
 #define TIMES_H
 
+#include <iostream>
+#include <ostream>
+#include <string>
 #include <thread>
 
 struct Time {
@@ -14,6 +17,14 @@ struct Time {
         const auto definedMilliseconds =
             std::chrono::milliseconds(milliseconds);
         std::this_thread::sleep_for(definedMilliseconds);
+    }
+    void slowTextGenerator(const std::string &text, const int &time) {
+        const auto definedTime = std::chrono::milliseconds(time);
+
+        for (int i = 0; i < text.length(); i++) {
+            std::this_thread::sleep_for(definedTime);
+            std::cout << text[i] << std::flush;
+        }
     }
 };
 

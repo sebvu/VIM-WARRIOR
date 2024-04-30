@@ -3,32 +3,37 @@
     0 - Successful exit
     1 - Fatal program error
 */
-#include "./include/Colors.h"
-#include "./include/Exception.h"
-#include "./include/Times.h"
+#include "./include/BossEntity.h"
+#include "./include/PlayerEntity.h"
+#include "./include/helpers/Colors.h"
+#include "./include/helpers/Exception.h"
+#include "./include/helpers/Times.h"
+#include "./include/helpers/Randomizer.h"
 #include <cstdio>
 #include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <ostream>
 #include <random>
 #include <string>
-// #include <iomanip>
 
 // ANSI Escape Codes for Color Control
-const Color color;
+Color color;
 // Struct for Easy Time Control
-Time setTime;
+Time count;
+// Randomizer for easier distributions
+Randomizer rando;
 
 // pre-defining all functions
 void printSword();
-void BeginningScreenSequence();
-void TitleScreen();
-int StartOptions();
+void beginScreenSequence();
+void displayTitleScreen();
+int displayStartOptions();
 bool isEmptyFile(std::ifstream &pFile, const std::string &fileName);
 std::string appendFileDirectory(const std::string &fileInput);
-void fileToTrackerFormat(std::ofstream &outputTracker,
+void formatFileToTracker(std::ofstream &outputTracker,
                          const std::string &fileName);
 void rewriteTrackedWithoutSpecifiedFile(const std::string &fileName);
 void addFileToTracker(const std::string &fileName);
@@ -37,15 +42,17 @@ void printCurrentSaveFiles();
 void saveGame();
 void loadGame();
 void deleteSavedGame();
+void newGameSequence();
 void newGame();
+// void generateMap();
 
 // Function Definitions
 
 void printSword() {  // Prints out sword ASCII
     std::cout << color.BOLD_RED << R"(
             ()
-            )(
-         o======o
+            )(                 (ULTRA BETA)
+         o======o (FEATURES ARE NOT FULLY IMPLEMENTED YET)
             ||    
             ||
             ||
@@ -61,36 +68,31 @@ void printSword() {  // Prints out sword ASCII
 }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
-    std::cout << color.ITALICIZE_BLUE
-              << "           The kingdom sent me here to these depths.."
-              << std::endl
-              << std::endl;
+    std::cout << color.ITALICIZE_BLUE;
+    count.slowTextGenerator("The kingdom sent me here to these depths..", 20);
+    count.seconds(2);
+    std::cout << std::endl << std::endl;
 
-    setTime.seconds(2);
+    std::cout << color.ITALICIZE_LIGHTGRAY;
+    count.slowTextGenerator("...I know nothing else", 20);
+    count.seconds(2);
+    std::cout << std::endl << std::endl;
 
-    std::cout << color.ITALICIZE_LIGHTGRAY << "...I know nothing else"
-              << std::endl
-              << std::endl;
+    std::cout << color.ITALICIZE_BLACK;
+    count.slowTextGenerator("But to serve.", 20);
+    count.seconds(2);
+    std::cout << std::endl << std::endl;
 
-    setTime.seconds(2);
-
-    std::cout << color.ITALICIZE_BLACK << "               But to serve."
-              << std::endl
-              << std::endl;
-
-    setTime.seconds(2);
-
-    std::cout << color.ITALICIZE_RED << "       As a " << color.BOLD
-              << "warrior." << std::endl;
-
-    std::random_device rd;
+    std::cout << color.ITALICIZE_RED;
+    count.slowTextGenerator("       As a ", 20);
+    std::cout << color.BOLD;
+    count.slowTextGenerator("warrior.", 20);
+    std::cout << std::endl;
 
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 27; j++) {
-            std::uniform_int_distribution<int> dist(i, 20);
-            if (dist(rd) >= 17) {
-                std::uniform_int_distribution<int> dist(1, 2);
-                if (dist(rd) % 2 == 0)
+            if (rando.getRandomDistribution(i, 20) >= 17) {
+                if (rando.getRandomDistribution(1, 2) % 2 == 0)
                     std::cout << color.ITALICIZE_ORANGE;
                 else
                     std::cout << color.ITALICIZE_RED;
@@ -99,7 +101,7 @@ void beginningScreenSequence() {  // beginning animation-ish sequence
                 std::cout << " ";
             }
             std::cout << std::flush;
-            setTime.milliseconds(5);
+            count.milliseconds(5);
         }
         std::cout << std::endl;
     }
@@ -127,7 +129,7 @@ void titleScreen() {
         << "(\\ _ /)\n(=t.t=)" << color.NC << std::endl
         << std::flush;
 
-    setTime.seconds(6);
+    count.seconds(6);
     std::cout << std::endl << std::endl;
 
     beginningScreenSequence();
@@ -198,7 +200,7 @@ std::string appendFileDirectory(const std::string &fileInput) {
     return saveGameDirectory;
 }
 
-void fileToTrackerFormat(std::ofstream &outputTracker,
+void formatFileToTracker(std::ofstream &outputTracker,
                          const std::string &fileName) {
     // get current current date
     time_t now = time(0);
@@ -291,7 +293,7 @@ void addFileToTracker(const std::string &fileName) {
         throw essentialFileNotOpen(fileTracker);
     }
     // add original file to end
-    fileToTrackerFormat(outputTracker, fileName);
+    formatFileToTracker(outputTracker, fileName);
     outputTracker.close();
 }
 
@@ -413,8 +415,8 @@ void loadGame() {
                       << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                       << "==========" << std::endl
                       << std::endl
-                      << color.GREEN << "No saved files found."
-                      << color.PURPLE << std::endl
+                      << color.GREEN << "No saved files found." << color.PURPLE
+                      << std::endl
                       << std::endl
                       << "=======================================" << color.NC
                       << std::endl;
@@ -478,56 +480,67 @@ void deleteSavedGame() {
         return;
     }
     while (true) {
-    tracker.close();
-    printCurrentSaveFiles();
+        tracker.close();
+        printCurrentSaveFiles();
 
-    std::string input = "";
-    std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE
-              << " DELETE SAVED GAME " << color.NC << color.PURPLE << "<<"
-              << std::endl
-              << std::endl;
-    std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
-    std::cout << "Please enter the saved game you wish to delete: "
-              << color.BOLD_CYAN;
-    std::cin >> input;
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << color.NC << std::endl;
-    if (input == "exit")
-        return;
+        std::string input = "";
+        std::cout << color.PURPLE << ">>" << color.BOLD_ORANGE
+                  << " DELETE SAVED GAME " << color.NC << color.PURPLE << "<<"
+                  << std::endl
+                  << std::endl;
+        std::cout << "(Enter 'exit' to return to main menu)" << std::endl;
+        std::cout << "Please enter the saved game you wish to delete: "
+                  << color.BOLD_CYAN;
+        std::cin >> input;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << color.NC << std::endl;
+        if (input == "exit")
+            return;
 
-    const std::string userInputFile = appendFileDirectory(input);
-    // concert to const char * for remove
-    const char *c = userInputFile.c_str();
-    std::ifstream trackedFiles(userInputFile);
-    std::cout << color.BOLD_ORANGE;
-    if (!trackedFiles.is_open()) {
-        std::cout << input << " is not saved file! Please try again." << std::endl;
-        continue;
-    } else if (std::remove(c) == 0) {
-        rewriteTrackedWithoutSpecifiedFile(input);
-        std::cout << "Saved game was successfully deleted." << std::endl;
-        return;
-    } else {
-        std::cout << "Saved game was NOT deleted." << std::endl;
-        return;
+        const std::string userInputFile = appendFileDirectory(input);
+        // concert to const char * for remove
+        const char *c = userInputFile.c_str();
+        std::ifstream trackedFiles(userInputFile);
+        std::cout << color.BOLD_ORANGE;
+        if (!trackedFiles.is_open()) {
+            std::cout << input << " is not saved file! Please try again."
+                      << std::endl;
+            continue;
+        } else if (std::remove(c) == 0) {
+            rewriteTrackedWithoutSpecifiedFile(input);
+            std::cout << "Saved game was successfully deleted." << std::endl;
+            return;
+        } else {
+            std::cout << "Saved game was NOT deleted." << std::endl;
+            return;
+        }
+        std::cout << color.NC << color.PURPLE;
+        trackedFiles.close();
     }
-    std::cout << color.NC << color.PURPLE;
-    trackedFiles.close();
-    }
+}
+
+// void generateMap() {
+// }
+
+void newGameSequence() {
+    count.slowTextGenerator("As I enter this dungeon..", 20);
+    count.seconds(2);
+    std::cout << std::endl << std::endl;
+    count.slowTextGenerator("I do not know what I will encounter..", 20);
+    count.seconds(2);
+    std::cout << std::endl << std::endl;
+    count.slowTextGenerator("But anything for the ", 20);
+    count.slowTextGenerator("kingdom...", 300);
 }
 
 void newGame() {
-    std::cout << "STARTING NEW GAME" << std::endl;
-    std::cout << "Loading .";
-    for (int i = 0; i < 3; i++) {
-        setTime.seconds(1);
-        std::cout << ". ";
-    }
+    newGameSequence();
+    // generateMap();
 }
 
 int main() {
-    // titleScreen();  // Initialize title screen
+    titleScreen();  // Initialize title screen
     try {
         while (true) {
             int option = startOptions();
