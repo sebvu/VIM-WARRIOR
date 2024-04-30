@@ -21,6 +21,26 @@ const Color color;
 // Struct for Easy Time Control
 Time setTime;
 
+// pre-defining all functions
+void printSword();
+void BeginningScreenSequence();
+void TitleScreen();
+int StartOptions();
+bool isEmptyFile(std::ifstream &pFile, const std::string &fileName);
+std::string appendFileDirectory(const std::string &fileInput);
+void fileToTrackerFormat(std::ofstream &outputTracker,
+                         const std::string &fileName);
+void rewriteTrackedWithoutSpecifiedFile(const std::string &fileName);
+void addFileToTracker(const std::string &fileName);
+void programExit();
+void printCurrentSaveFiles();
+void saveGame();
+void loadGame();
+void deleteSavedGame();
+void newGame();
+
+// Function Definitions
+
 void printSword() {  // Prints out sword ASCII
     std::cout << color.BOLD_RED << R"(
             ()
@@ -147,13 +167,14 @@ int startOptions() {
                 return choice;
             } else {
                 std::cout << color.BOLD_ORANGE << "Not an option!" << color.NC
-                          << color.PURPLE << std::endl;
-                continue;
+                          << color.PURPLE << std::endl
+                          << std::endl;
             }
         } else {
-            std::cout << color.BOLD_ORANGE
+            std::cout << color.BOLD_ORANGE << std::endl
                       << "Invalid input type, please try again." << color.NC
-                      << color.PURPLE << std::endl;
+                      << color.PURPLE << std::endl
+                      << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
@@ -376,7 +397,7 @@ void saveGame() {
                 DELETE ONCE IMPLEMENTED
             */
             saveFile.close();
-            break;
+            return;
         }
     }
 }
@@ -392,7 +413,8 @@ void loadGame() {
                       << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                       << "==========" << std::endl
                       << std::endl
-                      << "No saved files found." << std::endl
+                      << color.GREEN << "No saved files found."
+                      << color.PURPLE << std::endl
                       << std::endl
                       << "=======================================" << color.NC
                       << std::endl;
@@ -422,8 +444,10 @@ void loadGame() {
         std::ifstream loadFile(saveGameDirectory);
 
         if (!loadFile.is_open()) {
-            std::cout << loadedSaveFile
-                      << " is not a save file! Please try again." << std::endl;
+            std::cout << color.BOLD_ORANGE << loadedSaveFile
+                      << " is not a save file! Please try again." << color.NC
+                      << color.PURPLE << std::endl
+                      << std::endl;
             loadFile.close();
         } else {
             /*
@@ -431,6 +455,7 @@ void loadGame() {
                 DELETE ONCE IMPLEMENTED
             */
             loadFile.close();
+            return;
         }
     }
 }
@@ -444,13 +469,15 @@ void deleteSavedGame() {
                   << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                   << "==========" << std::endl
                   << std::endl
-                  << "No saved files found." << std::endl
+                  << color.GREEN << "No saved files found." << color.PURPLE
+                  << std::endl
                   << std::endl
                   << "=======================================" << color.NC
                   << std::endl;
         tracker.close();
         return;
     }
+    while (true) {
     tracker.close();
     printCurrentSaveFiles();
 
@@ -473,15 +500,21 @@ void deleteSavedGame() {
     // concert to const char * for remove
     const char *c = userInputFile.c_str();
     std::ifstream trackedFiles(userInputFile);
+    std::cout << color.BOLD_ORANGE;
     if (!trackedFiles.is_open()) {
-        throw essentialFileNotOpen(userInputFile);
+        std::cout << input << " is not saved file! Please try again." << std::endl;
+        continue;
     } else if (std::remove(c) == 0) {
         rewriteTrackedWithoutSpecifiedFile(input);
         std::cout << "Saved game was successfully deleted." << std::endl;
+        return;
     } else {
         std::cout << "Saved game was NOT deleted." << std::endl;
+        return;
     }
+    std::cout << color.NC << color.PURPLE;
     trackedFiles.close();
+    }
 }
 
 void newGame() {
