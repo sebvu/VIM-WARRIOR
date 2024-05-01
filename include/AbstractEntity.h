@@ -6,21 +6,21 @@
 #include <string>
 
 class AbstractEntity {
- private:
+ public:
     double health;
     std::string name;
-    double attackDmg;
     int experience;
 
  public:
+    AbstractEntity(double health, std::string name, int experience)
+        : health(health), name(name), experience(experience) {}
+    
     void setHealth(double newHealth) { health = newHealth; }
-    void setAttackDmg(double newAttackDmg) { attackDmg = newAttackDmg; }
-    double getAttackDmg() { return attackDmg; }
     double getHealth() { return health; }
     std::string getName() { return name; }
 
-    virtual void attack();
-    virtual void specialAttack();
+    virtual void attack() = 0;
+    virtual void specialAttack() = 0;
 };
 
 #endif

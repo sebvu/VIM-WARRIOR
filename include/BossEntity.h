@@ -11,6 +11,8 @@ class BossEntity : public EnemyEntity {
     void asciiArt(); 
     void encounterMessage(); 
     void printStats(); 
+    void attack(); 
+    void specialAttack(); 
 };
 
 #endif

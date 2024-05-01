@@ -27,6 +27,8 @@ class EnemyEntity : public AbstractEntity {  // await more implementation
     virtual void asciiArt() = 0;          // ascii art
     virtual void encounterMessage() = 0;  // encounterMessage
     virtual void printStats() = 0;        // stat printout
+    virtual void attack() = 0;
+    virtual void specialAttack() = 0;
 };
 
 #endif

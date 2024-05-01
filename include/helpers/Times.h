@@ -18,7 +18,7 @@ struct Time {
             std::chrono::milliseconds(milliseconds);
         std::this_thread::sleep_for(definedMilliseconds);
     }
-    void slowTextGenerator(const std::string &text, const int &time) {
+    void procedurallyPrintText(const std::string &text, const int &time) {
         const auto definedTime = std::chrono::milliseconds(time);
 
         for (int i = 0; i < text.length(); i++) {

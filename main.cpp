@@ -3,20 +3,21 @@
     0 - Successful exit
     1 - Fatal program error
 */
-#include "./include/BossEntity.h"
+// #include "./include/BossEntity.h"
 #include "./include/PlayerEntity.h"
+// #include "./include/AbstractEntity.h"
 #include "./include/helpers/Colors.h"
 #include "./include/helpers/Exception.h"
-#include "./include/helpers/Times.h"
 #include "./include/helpers/Randomizer.h"
+#include "./include/helpers/Times.h"
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <ostream>
-#include <random>
 #include <string>
 
 // ANSI Escape Codes for Color Control
@@ -27,6 +28,7 @@ Time count;
 Randomizer rando;
 
 // pre-defining all functions
+void clearScreen();
 void printSword();
 void beginScreenSequence();
 void displayTitleScreen();
@@ -43,10 +45,26 @@ void saveGame();
 void loadGame();
 void deleteSavedGame();
 void newGameSequence();
-void newGame();
+int gameChoice(PlayerEntity player);  // display game choices
+void titleScreen();                   // display title screen
+int startOptions();                   // display start options
+void newGame();                       // new game
+void newEncounter();                  // init new encounter
+void checkInventory();                // open inventory ui
+void printLogBook();                  // print previous encounters
+void textWall();                      // spam text wall
+std::string nameSetter();             // setting name function
 // void generateMap();
 
 // Function Definitions
+
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
 
 void printSword() {  // Prints out sword ASCII
     std::cout << color.BOLD_RED << R"(
@@ -69,24 +87,25 @@ void printSword() {  // Prints out sword ASCII
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
     std::cout << color.ITALICIZE_BLUE;
-    count.slowTextGenerator("The kingdom sent me here to these depths..", 20);
+    count.procedurallyPrintText("The kingdom sent me here to these depths..",
+                                20);
     count.seconds(2);
     std::cout << std::endl << std::endl;
 
     std::cout << color.ITALICIZE_LIGHTGRAY;
-    count.slowTextGenerator("...I know nothing else", 20);
+    count.procedurallyPrintText("...I know nothing else", 20);
     count.seconds(2);
     std::cout << std::endl << std::endl;
 
     std::cout << color.ITALICIZE_BLACK;
-    count.slowTextGenerator("But to serve.", 20);
+    count.procedurallyPrintText("But to serve.", 20);
     count.seconds(2);
     std::cout << std::endl << std::endl;
 
     std::cout << color.ITALICIZE_RED;
-    count.slowTextGenerator("       As a ", 20);
+    count.procedurallyPrintText("       As a ", 20);
     std::cout << color.BOLD;
-    count.slowTextGenerator("warrior.", 20);
+    count.procedurallyPrintText("warrior.", 20);
     std::cout << std::endl;
 
     for (int i = 0; i < 20; i++) {
@@ -130,7 +149,8 @@ void titleScreen() {
         << std::flush;
 
     count.seconds(6);
-    std::cout << std::endl << std::endl;
+
+    clearScreen();
 
     beginningScreenSequence();
 }
@@ -152,10 +172,8 @@ int startOptions() {
                   << "(" << color.BOLD_ORANGE << "2" << color.NC << color.PURPLE
                   << ") Load Game" << std::endl
                   << "(" << color.BOLD_ORANGE << "3" << color.NC << color.PURPLE
-                  << ") Save Game" << std::endl
-                  << "(" << color.BOLD_ORANGE << "4" << color.NC << color.PURPLE
                   << ") Delete Saved Game" << std::endl
-                  << "(" << color.BOLD_ORANGE << "5" << color.NC << color.PURPLE
+                  << "(" << color.BOLD_ORANGE << "4" << color.NC << color.PURPLE
                   << ") Exit" << std::endl
                   << std::endl
                   << "Enter your choice: " << color.BOLD_CYAN;
@@ -360,7 +378,6 @@ void saveGame() {
                   << "Naming over an existing file will overwrite the file."
                   << std::endl
                   << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
-                  << "Save files are stored in the 'savedGames' directory."
                   << std::endl
                   << color.BOLD_ORANGE << " - " << color.NC << color.PURPLE
                   << "Cannot contain . or /" << std::endl
@@ -415,8 +432,8 @@ void loadGame() {
                       << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                       << "==========" << std::endl
                       << std::endl
-                      << color.GREEN << "No saved files found." << color.PURPLE
-                      << std::endl
+                      << color.GREEN << "No saved files to load found!"
+                      << color.PURPLE << std::endl
                       << std::endl
                       << "=======================================" << color.NC
                       << std::endl;
@@ -471,8 +488,8 @@ void deleteSavedGame() {
                   << "LIST OF SAVED FILES" << color.NC << color.PURPLE
                   << "==========" << std::endl
                   << std::endl
-                  << color.GREEN << "No saved files found." << color.PURPLE
-                  << std::endl
+                  << color.GREEN << "No saved files to delete found!"
+                  << color.PURPLE << std::endl
                   << std::endl
                   << "=======================================" << color.NC
                   << std::endl;
@@ -523,24 +540,116 @@ void deleteSavedGame() {
 // void generateMap() {
 // }
 
+void textWall() {
+    std::cout << color.BOLD_RED;
+    for (int i = 0; i < 100; i++) {
+        if (rando.getRandomDistribution(0, 100) < 95)
+            count.procedurallyPrintText("ITSALIE", 1);
+        else
+            count.procedurallyPrintText("meow", 1);
+    }
+}
+
+void textWallCloserFunction() { count.milliseconds(50); }
+
+std::string nameSetter() {
+    std::string name;
+    // name scene
+    while (true) {
+        std::cout << color.BOLD_CYAN;
+        count.procedurallyPrintText("What is my name..? ", 20);
+        std::cin >> name;
+        std::cout << std::endl;
+        if (name.find(".") != std::string::npos ||
+            name.find("/") != std::string::npos || name.size() < 3 ||
+            name.size() > 10) {
+            count.procedurallyPrintText("That can't be my name... ", 20);
+            count.seconds(2);
+        } else {
+            count.procedurallyPrintText("Ah yes... ", 20);
+            count.seconds(1);
+            count.procedurallyPrintText("my name is " + name + ".", 20);
+            count.seconds(2);
+            count.procedurallyPrintText(" What a odd na-", 20);
+            std::cout << color.NC;
+            return name;
+        }
+    }
+}
+
 void newGameSequence() {
-    count.slowTextGenerator("As I enter this dungeon..", 20);
+    std::cout << color.ORANGE;
+    count.procedurallyPrintText("As I enter this dungeon..", 20);
     count.seconds(2);
     std::cout << std::endl << std::endl;
-    count.slowTextGenerator("I do not know what I will encounter..", 20);
+    count.procedurallyPrintText("I do not know what I will encounter..", 20);
     count.seconds(2);
     std::cout << std::endl << std::endl;
-    count.slowTextGenerator("But anything for the ", 20);
-    count.slowTextGenerator("kingdom...", 300);
+    count.procedurallyPrintText("But anything for the ", 20);
+    std::cout << color.ITALICIZE_ORANGE;
+    count.procedurallyPrintText("kingdom...", 200);
+
+    std::cout << color.NC << std::endl;
+
+    textWall();
+}
+
+int gameChoice(PlayerEntity player) {
+    int choice;
+    std::cout << color.PURPLE;
+    // 40
+    std::cout << R"(
+============================================================
+                        >> )"
+              << color.BOLD_ORANGE << "ACTION" << color.NC << color.PURPLE
+              << R"( <<)" << std::endl;
+    std::cout << color.BOLD_CYAN;
+    std::cout << "NAME: " << color.NC << color.GREEN << player.getName()
+              << std::endl;
+
+    std::cout << "============================================================";
+    std::cout << color.PURPLE;
+    std::cout << "Please enter your action: " << color.BOLD_CYAN;
+    std::cin >> choice;
+    return choice;
 }
 
 void newGame() {
+    // creating a player object upon initialization
+    std::string name = nameSetter();
+    PlayerEntity player(name, 100.0, 0);
+    clearScreen();
     newGameSequence();
-    // generateMap();
+    clearScreen();
+    while (true) {
+        // GAME SEQUENCE IN THIS WHILE TRUE BLOCK
+
+        /*
+        ‼️   THIS IS NOT THE FINAL VERSION. WILL BE ULTIMATELY REVAMPED
+        */
+        int option = gameChoice(player);
+
+        switch (option) {
+        case (1):  // new encounter
+            // newEncounter();
+            break;
+        case (2):  // check inventory
+            // checkInventory();
+            break;
+        case (4):  // encounter logbook
+            // printLogBooK();
+            break;
+        case (3):  // save and quit
+            saveGame();
+            return;
+            break;
+        }
+    }
 }
 
 int main() {
-    titleScreen();  // Initialize title screen
+    // titleScreen();  // Initialize title screen
+    clearScreen();
     try {
         while (true) {
             int option = startOptions();
@@ -549,23 +658,19 @@ int main() {
 
             switch (option) {
             case (1):  // New Game
+                clearScreen();
                 newGame();
                 break;
             case (2):  // Load Game
+                clearScreen();
                 loadGame();
                 break;
-            case (3):  // Save Game
-                saveGame();
-                break;
-            case (4):  // Delete Saved Game
+            case (3):  // Delete Saved Game
+                clearScreen();
                 deleteSavedGame();
                 break;
-            case (5):  // Exit
-                /*
-                   ‼️  FOR EXITING, IMPLEMENT A 'BUFFER'
-                   IN WHICH A BUFFER BASICALLY CHECKS IF THERE IS STILL DATA
-                   NEEDED TO BE SAVED. IF SO, PROMPT USER TO SAVE GAME
-                */
+            case (4):  // Exit
+                clearScreen();
                 programExit();
                 break;
             }
