@@ -105,7 +105,7 @@ void doubleNewLine() { std::cout << std::endl << std::endl; }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
     generate.procedurallyPrintSetter(
-        "The kingdom sent me here to these depths..", 20, color.ITALICIZE_BLUE,
+        "The vaktovian empire sent me here to these depths..", 20, color.ITALICIZE_BLUE,
         false);
     chrono.seconds(2);
     doubleNewLine();
@@ -606,7 +606,7 @@ void newGameSequence() {
     chrono.seconds(2);
     doubleNewLine();
     generate.procedurallyPrint("But anything for the ", 20);
-    generate.procedurallyPrintSetter("kingdom...", 200, color.ITALICIZE, false);
+    generate.procedurallyPrintSetter("empire...", 200, color.ITALICIZE, false);
 
     std::cout << color.NC << std::endl;
 
