@@ -18,6 +18,8 @@ Thanks, Dr. Dan for this project!
 
 #### Notes :rocket:
 
+- As of **05/02/24**, this project is <ins>**not finished!</ins> It is still in active development.
+
 - Dungeon Warrior utilizes ANSI escape codes for color formatting in the terminal. To ensure the game displays correctly,
 please make sure ANSI escape codes are enabled in your terminal emulator. Most Unix-like terminals have ANSI escape codes enabled by default.
 If you're using Windows 10 or later, you may need to enable ANSI support manually in your terminal settings for optimal experience.
@@ -26,3 +28,4 @@ If you're using Windows 10 or later, you may need to enable ANSI support manuall
 
 - I am genuinely open to criticism of any kind! I'm not even a junior developer, I'm just a college student haha. So please, contact me
 in any way possible and leave any suggestions! :)
+
