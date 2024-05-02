@@ -16,6 +16,7 @@
 #include "./include/helpers/Exception.h"
 #include "./include/helpers/Randomizer.h"
 #include "./include/helpers/Times.h"
+#include "./include/helpers/TextGeneration.h"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -29,11 +30,15 @@
 // ANSI Escape Codes for Color Control
 Color color;
 // Struct for Easy Time Control
-Time count;
+Time chrono;
 // Randomizer for easier distributions
 Randomizer rando;
+// Text generation helper for less bloating
+TextGenerator generate;
+
 
 // pre-defining all functions
+
 void clearScreen();          // clears current terminal screen
 void printSword();           // prints out sword ASCII
 void beginScreenSequence();  // beginning animation-ish sequence
@@ -55,7 +60,7 @@ void saveGame();                      // save current game state to a saved file
 void loadGame();                      // load a saved game
 void deleteSavedGame();               // delete a current saved game
 void newGameSequence();               // activate new game sequence lore
-int gameChoice(PlayerEntity player);  // display game choices
+int gameChoice(PlayerEntity Player);  // display game choices
 void titleScreen();                   // display title screen
 int startOptions();                   // display start options
 void newGame();                       // new game
@@ -99,25 +104,25 @@ void printSword() {  // Prints out sword ASCII
 void doubleNewLine() { std::cout << std::endl << std::endl; }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
-    count.procedurallyPrintSetter("The kingdom sent me here to these depths..",
+    generate.procedurallyPrintSetter("The kingdom sent me here to these depths..",
                                   20, color.ITALICIZE_BLUE, true);
-    count.seconds(2);
+    chrono.seconds(2);
     doubleNewLine();
 
     std::cout << color.ITALICIZE_LIGHTGRAY;
-    count.procedurallyPrintSetter("...I know nothing else", 20,
+    generate.procedurallyPrintSetter("...I know nothing else", 20,
                                   color.ITALICIZE_LIGHTGRAY, true);
-    count.seconds(2);
+    chrono.seconds(2);
     doubleNewLine();
 
-    count.procedurallyPrintSetter("But to serve.", 20, color.ITALICIZE_BLACK,
+    generate.procedurallyPrintSetter("But to serve.", 20, color.ITALICIZE_BLACK,
                                   true);
-    count.seconds(2);
+    chrono.seconds(2);
     doubleNewLine();
 
-    count.procedurallyPrintSetter("       As a ", 20, color.ITALICIZE_RED,
+    generate.procedurallyPrintSetter("       As a ", 20, color.ITALICIZE_RED,
                                   false);
-    count.procedurallyPrintSetter("warrior.", 20, color.BOLD, true);
+    generate.procedurallyPrintSetter("warrior.", 20, color.BOLD, true);
     doubleNewLine();
 
     for (int i = 0; i < 20; i++) {
@@ -132,7 +137,7 @@ void beginningScreenSequence() {  // beginning animation-ish sequence
                 std::cout << " ";
             }
             std::cout << std::flush;
-            count.milliseconds(5);
+            chrono.milliseconds(5);
         }
         std::cout << std::endl;
     }
@@ -160,7 +165,7 @@ void titleScreen() {
         << "(\\ _ /)\n(=t.t=)" << color.NC << std::endl
         << std::flush;
 
-    count.seconds(6);
+    chrono.seconds(6);
 
     clearScreen();
 
@@ -235,13 +240,15 @@ void formatFileToTracker(std::ofstream &outputTracker,
     // get current current date
     time_t now = time(0);
 
-    tm *ltm = localtime(&now);
+    struct tm localTime;
 
-    int year = 1900 + ltm->tm_year;
-    int month = 1 + ltm->tm_mon;
-    int day = ltm->tm_mday;
-    int hour = ltm->tm_hour;
-    int minute = ltm->tm_min;
+    localtime_r(&now, &localTime);
+
+    int year = 1900 + localTime.tm_year;
+    int month = 1 + localTime.tm_mon;
+    int day = localTime.tm_mday;
+    int hour = localTime.tm_hour;
+    int minute = localTime.tm_min;
 
     outputTracker << month << "/" << day << "/" << year << " " << hour << ":"
                   << minute << " - " << fileName
@@ -555,33 +562,33 @@ void deleteSavedGame() {
 void textWall() {
     for (int i = 0; i < 100; i++) {
         if (rando.getRandomDistribution(0, 100) < 95)
-            count.procedurallyPrintSetter("ITSALIE", 1, color.BOLD_RED, false);
+            generate.procedurallyPrintSetter("ITSALIE", 1, color.BOLD_RED, false);
         else
-            count.procedurallyPrintSetter("meow", 1, color.BOLD_RED, false);
+            generate.procedurallyPrintSetter("meow", 1, color.BOLD_RED, false);
     }
 }
 
-void textWallCloserFunction() { count.milliseconds(50); }
+void textWallCloserFunction() { chrono.milliseconds(50); }
 
 std::string nameSetter() {
     std::string name;
     // name scene
     while (true) {
-        count.procedurallyPrintSetter("What is my name..? ", 20,
+        generate.procedurallyPrintSetter("What is my name..? ", 20,
                                       color.BOLD_CYAN, false);
         std::cin >> name;
         std::cout << std::endl;
         if (name.find(".") != std::string::npos ||
             name.find("/") != std::string::npos || name.size() < 3 ||
             name.size() > 10) {
-            count.procedurallyPrint("That can't be my name... ", 20);
-            count.seconds(2);
+            generate.procedurallyPrint("That can't be my name... ", 20);
+            chrono.seconds(2);
         } else {
-            count.procedurallyPrint("Ah yes... ", 20);
-            count.seconds(1);
-            count.procedurallyPrint("my name is " + name + ".", 20);
-            count.seconds(2);
-            count.procedurallyPrint(" What a odd na-", 20);
+            generate.procedurallyPrint("Ah yes... ", 20);
+            chrono.seconds(1);
+            generate.procedurallyPrint("my name is " + name + ".", 20);
+            chrono.seconds(2);
+            generate.procedurallyPrint(" What a odd na-", 20);
             std::cout << color.NC;
             return name;
         }
@@ -589,45 +596,36 @@ std::string nameSetter() {
 }
 
 void newGameSequence() {
-    count.procedurallyPrintSetter("As I enter this dungeon..", 20,
+    generate.procedurallyPrintSetter("As I enter this dungeon..", 20,
                                   color.BOLD_CYAN, false);
-    count.seconds(2);
+    chrono.seconds(2);
     doubleNewLine();
-    count.procedurallyPrint("I do not know what I will encounter..", 20);
-    count.seconds(2);
+    generate.procedurallyPrint("I do not know what I will encounter..", 20);
+    chrono.seconds(2);
     doubleNewLine();
-    count.procedurallyPrint("But anything for the ", 20);
-    count.procedurallyPrintSetter("kingdom...", 200, color.ITALICIZE, false);
+    generate.procedurallyPrint("But anything for the ", 20);
+    generate.procedurallyPrintSetter("kingdom...", 200, color.ITALICIZE, false);
 
     std::cout << color.NC << std::endl;
 
     textWall();
 }
 
-int gameChoice(PlayerEntity player) {
+void displayCurrentExperience(PlayerEntity Player) {
+}
+
+int gameChoice(PlayerEntity Player) {
     int choice;
     std::cout << color.PURPLE;
-    // 40
-    std::cout << R"(
-============================================================
-                    >> )"
-              << color.BOLD_ORANGE << "CURRENT STATUS" << color.NC
-              << color.PURPLE << R"( <<)" << std::endl;
-    std::cout << color.BOLD_CYAN;
-    std::cout << "NAME: " << color.NC << color.GREEN << player.getName()
-              << std::endl;
-
-    std::cout << "============================================================";
-    std::cout << color.PURPLE;
-    std::cout << "Please enter your action: " << color.BOLD_CYAN;
     std::cin >> choice;
     return choice;
 }
 
+
 void newGame() {
     // creating a player object upon initialization
     std::string name = nameSetter();
-    PlayerEntity player("test", 100.0, 0);
+    PlayerEntity Player("test", 100.0, 0); // creation of player entity
     clearScreen();
     newGameSequence();
     clearScreen();
@@ -639,7 +637,7 @@ void newGame() {
         */
         std::cout << std::fixed
                   << std::setprecision(1);  // precision @ 1 decimal
-        int option = gameChoice(player);
+        int option = gameChoice(Player);
 
         switch (option) {
         case (1):  // new encounter
@@ -648,11 +646,17 @@ void newGame() {
         case (2):  // check inventory
             // checkInventory();
             break;
-        case (4):  // encounter logbook
+        case (3):  // encounter logbook
             // printLogBooK();
             break;
-        case (3):  // save and quit
+        case (4):  //save game
             saveGame();
+            return;
+            break;
+        case (5):  // save and quit
+            // Are you sure you want to quit?
+            // if yes, save game and quit, else back to gamechoice
+            //ensureExitGame();
             return;
             break;
         }
