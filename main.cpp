@@ -15,8 +15,8 @@
 #include "./include/helpers/Colors.h"
 #include "./include/helpers/Exception.h"
 #include "./include/helpers/Randomizer.h"
-#include "./include/helpers/Times.h"
 #include "./include/helpers/TextGeneration.h"
+#include "./include/helpers/Times.h"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -35,7 +35,6 @@ Time chrono;
 Randomizer rando;
 // Text generation helper for less bloating
 TextGenerator generate;
-
 
 // pre-defining all functions
 
@@ -70,6 +69,7 @@ void printLogBook();                  // print previous encounters
 void textWall();                      // spam text wall
 std::string nameSetter();             // setting name function
 void doubleNewLine();                 // double new line to remove bloat
+void printNoSavedFiles();             // display no current saved files
 // void generateMap();                // will be added later
 
 // Function Definitions
@@ -104,24 +104,25 @@ void printSword() {  // Prints out sword ASCII
 void doubleNewLine() { std::cout << std::endl << std::endl; }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
-    generate.procedurallyPrintSetter("The kingdom sent me here to these depths..",
-                                  20, color.ITALICIZE_BLUE, true);
+    generate.procedurallyPrintSetter(
+        "The kingdom sent me here to these depths..", 20, color.ITALICIZE_BLUE,
+        true);
     chrono.seconds(2);
     doubleNewLine();
 
     std::cout << color.ITALICIZE_LIGHTGRAY;
     generate.procedurallyPrintSetter("...I know nothing else", 20,
-                                  color.ITALICIZE_LIGHTGRAY, true);
+                                     color.ITALICIZE_LIGHTGRAY, true);
     chrono.seconds(2);
     doubleNewLine();
 
     generate.procedurallyPrintSetter("But to serve.", 20, color.ITALICIZE_BLACK,
-                                  true);
+                                     true);
     chrono.seconds(2);
     doubleNewLine();
 
     generate.procedurallyPrintSetter("       As a ", 20, color.ITALICIZE_RED,
-                                  false);
+                                     false);
     generate.procedurallyPrintSetter("warrior.", 20, color.BOLD, true);
     doubleNewLine();
 
@@ -440,23 +441,27 @@ void saveGame() {
     }
 }
 
+void printNoSavedFiles() {
+    generate.printSetter("==========", color.PURPLE, false);
+    generate.printSetter("LIST OF SAVED FILES", color.BOLD_ORANGE, false);
+    doubleNewLine();
+    generate.printSetter("MM/DD/YYYY HH/MM", color.GREEN, true);
+    doubleNewLine();
+    std::cout << "No saved files found!";
+    doubleNewLine();
+    generate.printSetter("==========", color.PURPLE, false);
+}
+
 void loadGame() {
     // Receive saveFile from user
     while (true) {
         std::string loadedSaveFile = "";
-        const std::string trackedSaves = "trackedGameFiles.txt";
-        std::ifstream tracker(trackedSaves);
-        if (isEmptyFile(tracker, trackedSaves)) {
-            std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
-                      << "LIST OF SAVED FILES" << color.NC << color.PURPLE
-                      << "==========" << std::endl
-                      << std::endl
-                      << color.GREEN << "No saved files to load found!"
-                      << color.PURPLE << std::endl
-                      << std::endl
-                      << "=======================================" << color.NC
-                      << std::endl;
+        const std::string fileTracker = "trackedGameFiles.txt";
+        std::ifstream tracker(fileTracker);
+        if (isEmptyFile(tracker, fileTracker)) {
+            printNoSavedFiles();
             tracker.close();
+            chrono.seconds(3);
             return;
         }
         tracker.close();
@@ -500,19 +505,12 @@ void loadGame() {
 
 void deleteSavedGame() {
     // print out list of current files
-    const std::string trackedSaves = "trackedGameFiles.txt";
-    std::ifstream tracker(trackedSaves);
-    if (isEmptyFile(tracker, trackedSaves)) {
-        std::cout << color.PURPLE << "==========" << color.BOLD_ORANGE
-                  << "LIST OF SAVED FILES" << color.NC << color.PURPLE
-                  << "==========" << std::endl
-                  << std::endl
-                  << color.GREEN << "No saved files to delete found!"
-                  << color.PURPLE << std::endl
-                  << std::endl
-                  << "=======================================" << color.NC
-                  << std::endl;
+    const std::string fileTracker = "trackedGameFiles.txt";
+    std::ifstream tracker(fileTracker);
+    if (isEmptyFile(tracker, fileTracker)) {
+        printNoSavedFiles();
         tracker.close();
+        chrono.seconds(3);
         return;
     }
     while (true) {
@@ -562,7 +560,8 @@ void deleteSavedGame() {
 void textWall() {
     for (int i = 0; i < 100; i++) {
         if (rando.getRandomDistribution(0, 100) < 95)
-            generate.procedurallyPrintSetter("ITSALIE", 1, color.BOLD_RED, false);
+            generate.procedurallyPrintSetter("ITSALIE", 1, color.BOLD_RED,
+                                             false);
         else
             generate.procedurallyPrintSetter("meow", 1, color.BOLD_RED, false);
     }
@@ -575,7 +574,7 @@ std::string nameSetter() {
     // name scene
     while (true) {
         generate.procedurallyPrintSetter("What is my name..? ", 20,
-                                      color.BOLD_CYAN, false);
+                                         color.BOLD_CYAN, false);
         std::cin >> name;
         std::cout << std::endl;
         if (name.find(".") != std::string::npos ||
@@ -597,7 +596,7 @@ std::string nameSetter() {
 
 void newGameSequence() {
     generate.procedurallyPrintSetter("As I enter this dungeon..", 20,
-                                  color.BOLD_CYAN, false);
+                                     color.BOLD_CYAN, false);
     chrono.seconds(2);
     doubleNewLine();
     generate.procedurallyPrint("I do not know what I will encounter..", 20);
@@ -611,8 +610,7 @@ void newGameSequence() {
     textWall();
 }
 
-void displayCurrentExperience(PlayerEntity Player) {
-}
+void displayCurrentExperience(PlayerEntity Player) {}
 
 int gameChoice(PlayerEntity Player) {
     int choice;
@@ -621,11 +619,10 @@ int gameChoice(PlayerEntity Player) {
     return choice;
 }
 
-
 void newGame() {
     // creating a player object upon initialization
     std::string name = nameSetter();
-    PlayerEntity Player("test", 100.0, 0); // creation of player entity
+    PlayerEntity Player("test", 100.0, 0);  // creation of player entity
     clearScreen();
     newGameSequence();
     clearScreen();
@@ -649,14 +646,14 @@ void newGame() {
         case (3):  // encounter logbook
             // printLogBooK();
             break;
-        case (4):  //save game
+        case (4):  // save game
             saveGame();
             return;
             break;
         case (5):  // save and quit
             // Are you sure you want to quit?
             // if yes, save game and quit, else back to gamechoice
-            //ensureExitGame();
+            // ensureExitGame();
             return;
             break;
         }
