@@ -106,24 +106,23 @@ void doubleNewLine() { std::cout << std::endl << std::endl; }
 void beginningScreenSequence() {  // beginning animation-ish sequence
     generate.procedurallyPrintSetter(
         "The kingdom sent me here to these depths..", 20, color.ITALICIZE_BLUE,
-        true);
+        false);
     chrono.seconds(2);
     doubleNewLine();
 
-    std::cout << color.ITALICIZE_LIGHTGRAY;
     generate.procedurallyPrintSetter("...I know nothing else", 20,
-                                     color.ITALICIZE_LIGHTGRAY, true);
+                                     color.ITALICIZE_BLACK, true);
     chrono.seconds(2);
     doubleNewLine();
 
-    generate.procedurallyPrintSetter("But to serve.", 20, color.ITALICIZE_BLACK,
-                                     true);
+    generate.procedurallyPrint("..but to", 20);
+    generate.procedurallyPrintSetter(" serve....", 20, color.ORANGE, true);
+
     chrono.seconds(2);
     doubleNewLine();
 
-    generate.procedurallyPrintSetter("       As a ", 20, color.ITALICIZE_RED,
-                                     false);
-    generate.procedurallyPrintSetter("warrior.", 20, color.BOLD, true);
+    generate.procedurallyPrint("       as a ", 20);
+    generate.procedurallyPrintSetter("WARRIOR.", 20, color.BOLD_RED, true);
     doubleNewLine();
 
     for (int i = 0; i < 20; i++) {
@@ -146,25 +145,24 @@ void beginningScreenSequence() {  // beginning animation-ish sequence
 
 void titleScreen() {
     // Begin title screen
-    std::cout
-        << std::endl
-        << color.UNDERLINE << color.BOLD_CYAN << "PREFACE" << color.NC
-        << std::endl  // Preface going over ANSI recommendation
-        << std::endl
-        << color.GREEN
-        << "This game is best experienced with ANSI escape codes enabled. "
-           "(i.e colors!!)"
-        << std::endl
-        << std::endl
-        << "Unix-like terminals (Linux & macOS) should have ANSI escape "
-           "codes enabled by default, however Windows 10+ needs manual "
-           "configuration. (correct me if im wrong :p)"
-        << std::endl
-        << std::endl
-        << "Thank you for reading, enjoy~!" << std::endl
-        << std::endl
-        << "(\\ _ /)\n(=t.t=)" << color.NC << std::endl
-        << std::flush;
+    std::cout << std::endl << color.UNDERLINE;
+    generate.printSetter("PREFACE", color.BOLD_CYAN, false);
+    doubleNewLine();
+    generate.printSetter("This game is best experience with ANSI escape codes "
+                         "enabled. (i.e colors!!)",
+                         color.GREEN, true);
+    doubleNewLine();
+    std::cout << "Unix-like terminals";
+    generate.printSetter(" should ", color.ITALICIZE, false);
+    std::cout << color.GREEN
+              << "have escape codes enabled, however, Windows 10+ would need "
+                 "manual configuration.";
+    doubleNewLine();
+    std::cout << "(correct me if I'm wrong, I never tested it personally :P)";
+    doubleNewLine();
+    std::cout << "Thank you for reading, please enjoy Dungeon Warrior~!";
+    doubleNewLine();
+    std::cout << "(\\ _ /)\n(=t.t=)" << color.NC << std::flush;
 
     chrono.seconds(6);
 
@@ -444,12 +442,15 @@ void saveGame() {
 void printNoSavedFiles() {
     generate.printSetter("==========", color.PURPLE, false);
     generate.printSetter("LIST OF SAVED FILES", color.BOLD_ORANGE, false);
+    generate.printSetter("==========", color.PURPLE, false);
     doubleNewLine();
     generate.printSetter("MM/DD/YYYY HH/MM", color.GREEN, true);
     doubleNewLine();
     std::cout << "No saved files found!";
     doubleNewLine();
-    generate.printSetter("==========", color.PURPLE, false);
+    generate.printSetter(
+        "=======================================", color.PURPLE, false);
+    std::cout << std::flush;
 }
 
 void loadGame() {
@@ -462,6 +463,7 @@ void loadGame() {
             printNoSavedFiles();
             tracker.close();
             chrono.seconds(3);
+            clearScreen();
             return;
         }
         tracker.close();
@@ -511,6 +513,7 @@ void deleteSavedGame() {
         printNoSavedFiles();
         tracker.close();
         chrono.seconds(3);
+        clearScreen();
         return;
     }
     while (true) {

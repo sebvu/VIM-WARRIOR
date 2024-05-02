@@ -17,7 +17,7 @@ struct TextGenerator {
         std::cout << color;
         procedurallyPrint(text, time);
 
-        if (escape)
+        if (!escape) // TRUE if they want to escape, false for no escape.
             std::cout << colors.NC;
     }
     // procedurally generate text with specified time gap
@@ -37,7 +37,7 @@ struct TextGenerator {
 
         std::cout << color << text;
 
-        if (escape)
+        if (!escape) // true to escape, false otherwise
             std::cout << colors.NC;
     }
     // procedurally generate text with specified time gap
