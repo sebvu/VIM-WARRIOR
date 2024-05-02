@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-// Definition in colors.cpp
+// Helper struct to define all ANSI escape codes for colors
 
 struct Color {
     // wider defaults

@@ -2,6 +2,12 @@
     EXIT CODE GUIDE:
     0 - Successful exit
     1 - Fatal program error
+
+💜 Dungeon Warrior  💜
+- This is a text-based RPG game that is currently in development.
+- Formatted code abides with the Google C++ Style Guide.
+- For more information, please check the .clang-format file.
+
 */
 // #include "./include/BossEntity.h"
 #include "./include/PlayerEntity.h"
@@ -28,23 +34,27 @@ Time count;
 Randomizer rando;
 
 // pre-defining all functions
-void clearScreen();
-void printSword();
-void beginScreenSequence();
-void displayTitleScreen();
-int displayStartOptions();
+void clearScreen();          // clears current terminal screen
+void printSword();           // prints out sword ASCII
+void beginScreenSequence();  // beginning animation-ish sequence
+void displayTitleScreen();   // display dungeon warrior title screen
+int displayStartOptions();   // display main start options
+// check if specified file is empty, if so, throw exception
 bool isEmptyFile(std::ifstream &pFile, const std::string &fileName);
+// append directory and specify .txt file
 std::string appendFileDirectory(const std::string &fileInput);
+// formats date, time and file name to tracker
 void formatFileToTracker(std::ofstream &outputTracker,
                          const std::string &fileName);
+// will rewrite trackedgamefiles.txt without specified file
 void rewriteTrackedWithoutSpecifiedFile(const std::string &fileName);
-void addFileToTracker(const std::string &fileName);
-void programExit();
-void printCurrentSaveFiles();
-void saveGame();
-void loadGame();
-void deleteSavedGame();
-void newGameSequence();
+void addFileToTracker(const std::string &fileName);  // add file to trackedgames
+void programExit();                                  // end program
+void printCurrentSaveFiles();         // print current saved games
+void saveGame();                      // save current game state to a saved file
+void loadGame();                      // load a saved game
+void deleteSavedGame();               // delete a current saved game
+void newGameSequence();               // activate new game sequence lore
 int gameChoice(PlayerEntity player);  // display game choices
 void titleScreen();                   // display title screen
 int startOptions();                   // display start options
@@ -54,7 +64,8 @@ void checkInventory();                // open inventory ui
 void printLogBook();                  // print previous encounters
 void textWall();                      // spam text wall
 std::string nameSetter();             // setting name function
-// void generateMap();
+void doubleNewLine();                 // double new line to remove bloat
+// void generateMap();                // will be added later
 
 // Function Definitions
 
@@ -85,28 +96,29 @@ void printSword() {  // Prints out sword ASCII
     )";
 }
 
+void doubleNewLine() { std::cout << std::endl << std::endl; }
+
 void beginningScreenSequence() {  // beginning animation-ish sequence
-    std::cout << color.ITALICIZE_BLUE;
-    count.procedurallyPrintText("The kingdom sent me here to these depths..",
-                                20);
+    count.procedurallyPrintSetter("The kingdom sent me here to these depths..",
+                                  20, color.ITALICIZE_BLUE, true);
     count.seconds(2);
-    std::cout << std::endl << std::endl;
+    doubleNewLine();
 
     std::cout << color.ITALICIZE_LIGHTGRAY;
-    count.procedurallyPrintText("...I know nothing else", 20);
+    count.procedurallyPrintSetter("...I know nothing else", 20,
+                                  color.ITALICIZE_LIGHTGRAY, true);
     count.seconds(2);
-    std::cout << std::endl << std::endl;
+    doubleNewLine();
 
-    std::cout << color.ITALICIZE_BLACK;
-    count.procedurallyPrintText("But to serve.", 20);
+    count.procedurallyPrintSetter("But to serve.", 20, color.ITALICIZE_BLACK,
+                                  true);
     count.seconds(2);
-    std::cout << std::endl << std::endl;
+    doubleNewLine();
 
-    std::cout << color.ITALICIZE_RED;
-    count.procedurallyPrintText("       As a ", 20);
-    std::cout << color.BOLD;
-    count.procedurallyPrintText("warrior.", 20);
-    std::cout << std::endl;
+    count.procedurallyPrintSetter("       As a ", 20, color.ITALICIZE_RED,
+                                  false);
+    count.procedurallyPrintSetter("warrior.", 20, color.BOLD, true);
+    doubleNewLine();
 
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 27; j++) {
@@ -541,12 +553,11 @@ void deleteSavedGame() {
 // }
 
 void textWall() {
-    std::cout << color.BOLD_RED;
     for (int i = 0; i < 100; i++) {
         if (rando.getRandomDistribution(0, 100) < 95)
-            count.procedurallyPrintText("ITSALIE", 1);
+            count.procedurallyPrintSetter("ITSALIE", 1, color.BOLD_RED, false);
         else
-            count.procedurallyPrintText("meow", 1);
+            count.procedurallyPrintSetter("meow", 1, color.BOLD_RED, false);
     }
 }
 
@@ -556,21 +567,21 @@ std::string nameSetter() {
     std::string name;
     // name scene
     while (true) {
-        std::cout << color.BOLD_CYAN;
-        count.procedurallyPrintText("What is my name..? ", 20);
+        count.procedurallyPrintSetter("What is my name..? ", 20,
+                                      color.BOLD_CYAN, false);
         std::cin >> name;
         std::cout << std::endl;
         if (name.find(".") != std::string::npos ||
             name.find("/") != std::string::npos || name.size() < 3 ||
             name.size() > 10) {
-            count.procedurallyPrintText("That can't be my name... ", 20);
+            count.procedurallyPrint("That can't be my name... ", 20);
             count.seconds(2);
         } else {
-            count.procedurallyPrintText("Ah yes... ", 20);
+            count.procedurallyPrint("Ah yes... ", 20);
             count.seconds(1);
-            count.procedurallyPrintText("my name is " + name + ".", 20);
+            count.procedurallyPrint("my name is " + name + ".", 20);
             count.seconds(2);
-            count.procedurallyPrintText(" What a odd na-", 20);
+            count.procedurallyPrint(" What a odd na-", 20);
             std::cout << color.NC;
             return name;
         }
@@ -578,16 +589,15 @@ std::string nameSetter() {
 }
 
 void newGameSequence() {
-    std::cout << color.ORANGE;
-    count.procedurallyPrintText("As I enter this dungeon..", 20);
+    count.procedurallyPrintSetter("As I enter this dungeon..", 20,
+                                  color.BOLD_CYAN, false);
     count.seconds(2);
-    std::cout << std::endl << std::endl;
-    count.procedurallyPrintText("I do not know what I will encounter..", 20);
+    doubleNewLine();
+    count.procedurallyPrint("I do not know what I will encounter..", 20);
     count.seconds(2);
-    std::cout << std::endl << std::endl;
-    count.procedurallyPrintText("But anything for the ", 20);
-    std::cout << color.ITALICIZE_ORANGE;
-    count.procedurallyPrintText("kingdom...", 200);
+    doubleNewLine();
+    count.procedurallyPrint("But anything for the ", 20);
+    count.procedurallyPrintSetter("kingdom...", 200, color.ITALICIZE, false);
 
     std::cout << color.NC << std::endl;
 
@@ -600,9 +610,9 @@ int gameChoice(PlayerEntity player) {
     // 40
     std::cout << R"(
 ============================================================
-                        >> )"
-              << color.BOLD_ORANGE << "ACTION" << color.NC << color.PURPLE
-              << R"( <<)" << std::endl;
+                    >> )"
+              << color.BOLD_ORANGE << "CURRENT STATUS" << color.NC
+              << color.PURPLE << R"( <<)" << std::endl;
     std::cout << color.BOLD_CYAN;
     std::cout << "NAME: " << color.NC << color.GREEN << player.getName()
               << std::endl;
@@ -617,7 +627,7 @@ int gameChoice(PlayerEntity player) {
 void newGame() {
     // creating a player object upon initialization
     std::string name = nameSetter();
-    PlayerEntity player(name, 100.0, 0);
+    PlayerEntity player("test", 100.0, 0);
     clearScreen();
     newGameSequence();
     clearScreen();
@@ -627,6 +637,8 @@ void newGame() {
         /*
         ‼️   THIS IS NOT THE FINAL VERSION. WILL BE ULTIMATELY REVAMPED
         */
+        std::cout << std::fixed
+                  << std::setprecision(1);  // precision @ 1 decimal
         int option = gameChoice(player);
 
         switch (option) {
@@ -654,7 +666,7 @@ int main() {
         while (true) {
             int option = startOptions();
 
-            std::cout << std::endl << std::endl;  // spacing
+            doubleNewLine();  // spacing
 
             switch (option) {
             case (1):  // New Game

@@ -3,6 +3,8 @@
 
 #include <string>
 
+// contains all necessary defined exceptions
+
 class essentialFileNotOpen {
  private:
     std::string fileName;
