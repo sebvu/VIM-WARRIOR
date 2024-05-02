@@ -577,7 +577,7 @@ std::string nameSetter() {
     // name scene
     while (true) {
         generate.procedurallyPrintSetter("What is my name..? ", 20,
-                                         color.BOLD_CYAN, false);
+                                         color.BOLD_CYAN, true);
         std::cin >> name;
         std::cout << std::endl;
         if (name.find(".") != std::string::npos ||
@@ -599,7 +599,7 @@ std::string nameSetter() {
 
 void newGameSequence() {
     generate.procedurallyPrintSetter("As I enter this dungeon..", 20,
-                                     color.BOLD_CYAN, false);
+                                     color.BOLD_CYAN, true);
     chrono.seconds(2);
     doubleNewLine();
     generate.procedurallyPrint("I do not know what I will encounter..", 20);
