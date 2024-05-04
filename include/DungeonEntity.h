@@ -1,12 +1,8 @@
-#ifndef DUNGEONENTITY_H
-#define DUNGEONENTITY_H
+#ifndef INCLUDE_DUNGEONENTITY_H_
+#define INCLUDE_DUNGEONENTITY_H_
 
 #include "EnemyEntity.h"
 
-class DungeonEntity : EnemyEntity {
+class DungeonEntity : EnemyEntity {};
 
-};
-
-#endif
-
-
+#endif  // INCLUDE_DUNGEONENTITY_H_

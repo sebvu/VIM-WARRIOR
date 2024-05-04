@@ -1,5 +1,5 @@
-#ifndef TEXTGENERATION_H
-#define TEXTGENERATION_H
+#ifndef INCLUDE_HELPERS_TEXTGENERATION_H_
+#define INCLUDE_HELPERS_TEXTGENERATION_H_
 
 #include "Colors.h"
 #include "Times.h"
@@ -17,7 +17,7 @@ struct TextGenerator {
         std::cout << color;
         procedurallyPrint(text, time);
 
-        if (!escape) // TRUE if they want to escape, false for no escape.
+        if (!escape)  // TRUE if they want to escape, false for no escape.
             std::cout << colors.NC;
     }
     // procedurally generate text with specified time gap
@@ -37,10 +37,10 @@ struct TextGenerator {
 
         std::cout << color << text;
 
-        if (!escape) // true to escape, false otherwise
+        if (!escape)  // true to escape, false otherwise
             std::cout << colors.NC;
     }
     // procedurally generate text with specified time gap
 };
 
-#endif
+#endif  // INCLUDE_HELPERS_TEXTGENERATION_H_

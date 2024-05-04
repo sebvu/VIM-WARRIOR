@@ -1,11 +1,11 @@
-#ifndef TIMES_H
-#define TIMES_H
+#ifndef INCLUDE_HELPERS_TIMES_H_
+#define INCLUDE_HELPERS_TIMES_H_
 
 #include <thread>
 
 // helper struct to define all time related functions
 
-struct Time {
+struct INCLUDE_HELPERS_Time {
     // produce time in x seconds
     void seconds(const int &seconds) {
         const auto definedSeconds = std::chrono::seconds(seconds);
@@ -19,4 +19,4 @@ struct Time {
     }
 };
 
-#endif
+#endif  // INCLUDE_HELPERS_TIMES_H_

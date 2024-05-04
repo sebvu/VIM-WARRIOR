@@ -105,8 +105,8 @@ void doubleNewLine() { std::cout << std::endl << std::endl; }
 
 void beginningScreenSequence() {  // beginning animation-ish sequence
     generate.procedurallyPrintSetter(
-        "The vaktovian empire sent me here to these depths..", 20, color.ITALICIZE_BLUE,
-        false);
+        "The vaktovian empire sent me here to these depths..", 20,
+        color.ITALICIZE_BLUE, false);
     chrono.seconds(2);
     doubleNewLine();
 
@@ -617,7 +617,9 @@ void displayCurrentExperience(PlayerEntity Player) {}
 
 int gameChoice(PlayerEntity Player) {
     int choice;
-    std::cout << color.PURPLE;
+    /*
+        ‼️   PROVIDE IMPLEMENTATION
+     */
     std::cin >> choice;
     return choice;
 }

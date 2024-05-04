@@ -9,8 +9,8 @@
    randomized or intentional.
 */
 
-#ifndef ENEMYENTITY_H
-#define ENEMYENTITY_H
+#ifndef INCLUDE_ENEMYENTITY_H_
+#define INCLUDE_ENEMYENTITY_H_
 
 #include "AbstractEntity.h"
 #include <string>
@@ -31,4 +31,4 @@ class EnemyEntity : public AbstractEntity {  // await more implementation
     virtual void specialAttack() = 0;
 };
 
-#endif
+#endif  // INCLUDE_ENEMYENTITY_H_

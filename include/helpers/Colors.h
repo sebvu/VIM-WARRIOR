@@ -1,5 +1,5 @@
-#ifndef COLORS_H
-#define COLORS_H
+#ifndef INCLUDE_HELPERS_COLORS_H_
+#define INCLUDE_HELPERS_COLORS_H_
 
 #include <iostream>
 #include <string>
@@ -54,4 +54,4 @@ struct Color {
     std::string UNDERLINE_LIGHTGRAY = "\033[4;37m";
 };
 
-#endif
+#endif  // INCLUDE_HELPERS_COLORS_H_

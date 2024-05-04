@@ -1,5 +1,5 @@
-#ifndef ABSTRACTENTITY_H
-#define ABSTRACTENTITY_H
+#ifndef INCLUDE_ABSTRACTENTITY_H_
+#define INCLUDE_ABSTRACTENTITY_H_
 
 // base implementation for all entities
 
@@ -14,7 +14,7 @@ class AbstractEntity {
  public:
     AbstractEntity(double health, std::string name, int experience)
         : health(health), name(name), experience(experience) {}
-    
+
     void setHealth(double newHealth) { health = newHealth; }
     double getHealth() { return health; }
     std::string getName() { return name; }
@@ -23,4 +23,4 @@ class AbstractEntity {
     virtual void specialAttack() = 0;
 };
 
-#endif
+#endif  // INCLUDE_ABSTRACTENTITY_H_

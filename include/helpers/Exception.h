@@ -1,5 +1,5 @@
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#ifndef INCLUDE_HELPERS_EXCEPTION_H_
+#define INCLUDE_HELPERS_EXCEPTION_H_
 
 #include <string>
 
@@ -8,6 +8,7 @@
 class essentialFileNotOpen {
  private:
     std::string fileName;
+
  public:
     // explicit for unintended conversions
     explicit essentialFileNotOpen(std::string fileName) : fileName(fileName) {}
@@ -15,4 +16,4 @@ class essentialFileNotOpen {
     const std::string getFileName() { return fileName; }
 };
 
-#endif
+#endif  // INCLUDE_HELPERS_EXCEPTION_H_

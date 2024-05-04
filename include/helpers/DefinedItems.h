@@ -1,5 +1,5 @@
-#ifndef ITEMSLIST_H
-#define ITEMSLIST_H
+#ifndef INCLUDE_HELPERS_DEFINEDITEMS_H_
+#define INCLUDE_HELPERS_DEFINEDITEMS_H_
 
 /*
 a list of items that can be generated
@@ -10,11 +10,11 @@ items will contain the following attributes:
 - rarity
 - enchantment
 - damage
+- speed
 - defense
 - type
 - ID
 - value
-- weight
 - description
 
 pre-defined
@@ -44,7 +44,8 @@ Enchantment:
         { Shrouding - Better chance to dodge
         { Cumbersome - Less chance to dodge
         { Uncomfortable - Slight debuff on all
-        { Reflective - Reflects a portion of incoming damage back at the attacker.
+        { Reflective - Reflects a portion of incoming damage back at the
+attacker.
 
 Damage and Defense:
 Each item has a base, will be scaled depending on rarity and enchantment.
@@ -137,7 +138,7 @@ Type:
                     { Vaktovian Subjugator Helmet
                     { Vaktovian Executioner's Cap
                 Boss:
-                    { Archangel's Eyes 
+                    { Archangel's Eyes
                     { Vaktovian Tyrant's Visage
                     { Ul'Nuks Destined Warrior's Crown
                     { Dungeon Warrior's Crown
@@ -148,7 +149,7 @@ Type:
             Armor:
                 General:
                     { Steel Pauldron
-                    { Cloth 
+                    { Cloth
                     { Steel Breastplate
                     { Leather Tunic
                     { Reinforced Chain Shirt
@@ -177,15 +178,147 @@ Type:
                     { Maid Outfit
                     { Signed Limp Bizkit Palladium Armor
 ID: All items will have a unique ID
+Weight: Will affect dodge chance, and damage affect.
 Description: All items will have a unique description
 */
 
-#include "Randomizer.h"
-#include "Times.h"
+// provide definition for all existing game items
 
-class ItemsGenerator {
- private:
- public:
-    void generateItem();
+#include <string>
+
+// ---- WEAPONS
+// type
+// level requirement
+// damage
+// weight
+// speed
+// durability
+// durability chipper
+// special attack hit modifier
+// special attack miss modifier
+// special attack punishment key
+// special attack punishment modifier
+// description
+// normal attack dialogue
+// normal attack hit
+// normal attack miss
+// special attack dialogue
+// special attack hit
+// special attack miss
+
+/*
+ design
+ levels: 1 - 20
+ weight:
+ 145 (default)
+ 145 - 200 (light) 201 - 300 (medium) 301 - 500 (heavy)
+ speed:
+ 10 (default)
+ 10 - 40 (slow) 40 - 70 (medium) 70 - 100 (fast)
+
+modifiers/dmg should deviate about 10% naturally
+
+chance to hit always scales from 1 - 100.
+
+ultimately EVERYTHING else calculates the chance to hit.
+
+LIST OF KEYS:
+
+"Durability"
+"Damage"
+"Health"
+"Weight" (chance of getting hit)
+"Speed" (less chance to hit)
+
+some rarities/enchantments will modify this ^
+
+*/
+
+struct DefinedItems {
+
+    std::string WEAPONS_GENERAL[2][100] = {
+        {
+            // ID
+            "1",
+            // type
+            "Stick",  // stick will serve as reference item
+                      // level requirement
+            "1",
+            // damage
+            "5.4",
+            // weight
+            "5",
+            // durability
+            "60",
+            // durability chipper
+            "4",
+            // Special Swing Hit Modifier
+            "1.2",
+            // Special Swing Miss Modifier
+            "0.6",
+            // Special Swing Punishment Key
+            "Durability",
+            // Special Swing Punishment Modifier
+            "2",
+            // description
+            "A surprisingly sturdy stick, you are quite effective wielding it "
+            "from "
+            "your service as a dungeon warrior for the empire!",
+            // normal attack dialogue
+            "Stick Lunge!\n\nYou lunge your stick forward with intent.",
+            // normal attack hit
+            "You stuck the enemy with your trusty stick!",
+            // normal attack miss
+            "The stick sadly misses its mark..",
+            // special attack dialogue
+            "Mighty Stick Swing!\n\nYou power up, and swing your stick with "
+            "all your warrior might!",
+            // special attack hit
+            "Your swing strikes your enemy with all of its might.",
+            // special attack miss
+            "Your swing tragically smashes in to the floor in shame.",
+        },
+        {
+            // ID
+            "2",
+            // type
+            "dagger",
+            // level requirement
+            "2",
+            // damage
+            "10.2",
+            // weight
+            "8",
+            // durability
+            "100",
+            // durability chipper
+            "6",
+            // special attack hit modifier
+            "1.1",
+            // special attack miss modifier
+            "0.7",
+            // special attack punishment key
+            "Health",
+            // special attack punishment modifier
+            "1.7",
+            // description
+            "A dagger possibly dropped by a passer-byer, you wonder how it "
+            "ended up here..",
+            // normal attack dialogue
+            "Aggressive Lunge!\n\nYou perform a quick lunge with your dagger.",
+            // normal attack hit
+            "You successfuly stab your enemy with your dagger!",
+            // normal attack miss
+            "Your dagger decides to take another path...",
+            // special attack dialogue
+            "Dagger Dance!\n\nYou perform a quick dance dagger dance, ready to "
+            "strike your enemy.",
+            // special attack hit
+            "Your enemy, caught off guard, is struck by your dagger dance!",
+            // special attack miss
+            "Your tripped over your own feet, and missed your dagger dance.",
+        },
+    };
 };
-#endif
+
+#endif  // INCLUDE_HELPERS_DEFINEDITEMS_H_
