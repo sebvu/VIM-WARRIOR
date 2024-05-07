@@ -5,7 +5,7 @@
 
 // helper struct to define all time related functions
 
-struct INCLUDE_HELPERS_Time {
+struct Times {
     // produce time in x seconds
     void seconds(const int &seconds) {
         const auto definedSeconds = std::chrono::seconds(seconds);

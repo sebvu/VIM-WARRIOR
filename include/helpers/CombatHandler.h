@@ -4,7 +4,6 @@
 #include "../Items.h"
 #include "Randomizer.h"
 #include "Times.h"
-#include <string>
 
 struct CombatHandler {
 
@@ -22,4 +21,4 @@ struct CombatHandler {
     // insert operators
 };
 
-#endif  // INCLUDE_HERLPERS_COMBATHANDLER_H_
+#endif  // INCLUDE_HELPERS_COMBATHANDLER_H_

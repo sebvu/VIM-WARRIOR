@@ -9,14 +9,6 @@
 - For more information, please check the .clang-format file.
 
 */
-// #include "./include/BossEntity.h"
-#include "./include/PlayerEntity.h"
-// #include "./include/AbstractEntity.h"
-#include "./include/helpers/Colors.h"
-#include "./include/helpers/Exception.h"
-#include "./include/helpers/Randomizer.h"
-#include "./include/helpers/TextGeneration.h"
-#include "./include/helpers/Times.h"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -26,11 +18,20 @@
 #include <limits>
 #include <ostream>
 #include <string>
+// #include "./include/BossEntity.h"
+#include "./include/PlayerEntity.h"
+// #include "./include/AbstractEntity.h"
+#include "./include/helpers/Colors.h"
+#include "./include/helpers/Exception.h"
+#include "./include/helpers/Randomizer.h"
+#include "./include/helpers/TextGeneration.h"
+#include "./include/helpers/Times.h"
+#include "include/helpers/Times.h"
 
 // ANSI Escape Codes for Color Control
 Color color;
 // Struct for Easy Time Control
-Time chrono;
+Times chrono;
 // Randomizer for easier distributions
 Randomizer rando;
 // Text generation helper for less bloating
@@ -613,8 +614,6 @@ void newGameSequence() {
     textWall();
 }
 
-void displayCurrentExperience(PlayerEntity Player) {}
-
 int gameChoice(PlayerEntity Player) {
     int choice;
     /*
@@ -627,7 +626,7 @@ int gameChoice(PlayerEntity Player) {
 void newGame() {
     // creating a player object upon initialization
     std::string name = nameSetter();
-    PlayerEntity Player("test", 100.0, 0);  // creation of player entity
+    PlayerEntity Player("test", 100.0, 0, 1);  // creation of player entity
     clearScreen();
     newGameSequence();
     clearScreen();
