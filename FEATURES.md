@@ -4,9 +4,12 @@
 
 # Dungeon Warrior! ⚔️
 
-- [ ] design the game
+  - [ ] design the game
   - [ ] Add save feature
+  - [ ] Add a game design document
   - [ ] Load previous save feature
+  - [ ] Write out main level
+  - [ ] Design game mechanics (touches on vim motions combat system)
   - [ ] ANSI escape code support for colors
   - [ ] Helper header files to abstract process
   - [ ] Pre-defining all objects in game
@@ -14,4 +17,4 @@
   - [ ] Find ncurses resources & documentation
   - [ ] Figure out how combat system would work and how it would be effected from different stats
 - [ ] making it into a package
-  - [ ] Find documentation on being able to upload project as a installable package
+  - [ ] Write out the tasks in [here](https://wiki.ubuntu.com/Upstream)
