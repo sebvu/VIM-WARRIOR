@@ -4,7 +4,7 @@
 
 # Dungeon Warrior! ⚔️
 
-  - [ ] design the game
+- [ ] design the game
   - [ ] Add save feature
   - [ ] Add a game design document
   - [ ] Load previous save feature
