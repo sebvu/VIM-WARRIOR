@@ -1,6 +1,6 @@
 ![Dungeon Warrior Banner](./assets/endYearProjectBanner.png)
 
-# IN THE PROCESS OF REDOING CODEBASE
+# List of features to build
 
 # Dungeon Warrior! ⚔️
 
