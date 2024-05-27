@@ -10,4 +10,4 @@
     - [ ] Design game mechanics (touches on vim motion combat sytem)
  - [ ] vim motion combat system (using ncurses potentially)
  - [ ] making it into a package
-    - [ ] Write out the tasks in ![here](https://wiki.ubuntu.com/Upstream)
+    - [ ] Write out the tasks in [here](https://wiki.ubuntu.com/Upstream)
