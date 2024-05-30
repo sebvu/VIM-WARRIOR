@@ -9,7 +9,7 @@ ncursesDay1 directory is to get aquainted with the ncurses library.
 
 
 #### TODO:
-- [ ] Writing the makefile template for the progams
+- [x] Writing the makefile template for the progams
 - [ ] Getting a window up
 - [ ] Moving a cursor
 - [ ] Add some excercises to get familiar with the library
