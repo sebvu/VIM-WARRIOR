@@ -10,7 +10,7 @@ LINKER_FLAGS = -lncurses
 #This is the target that compiles our executable
 all : 
 	$ g++ $(OBJS) $(LINKER_FLAGS) -o $(OBJ_NAME)
-	$ ./($OBJ_NAME)
+	$ ./$(OBJ_NAME)
 
 file : 
 	$ g++ $(OBJS) $(LINKER_FLAGS) -o $(OBJ_NAME)
