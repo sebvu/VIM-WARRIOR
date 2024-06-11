@@ -4,6 +4,9 @@
 
 # Dungeon Warrior! ⚔️
 
+- [ ] Contribute to the ncurses-library
+  - Knockout at least 1 wish in the wish list in 1.8. Wish List on [this](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/intro.html) 
+
 - [ ] design the game
   - [ ] Design and implement a menu
   - [ ] Add save feature
